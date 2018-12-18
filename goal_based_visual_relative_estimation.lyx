@@ -1,0 +1,999 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Goal-Based Visual Relative Estimation
+\end_layout
+
+\begin_layout Part
+Lie Algebra Assuming Static Target
+\end_layout
+
+\begin_layout Standard
+Most of the math is borrowed from 
+\begin_inset CommandInset href
+LatexCommand href
+name "VI_EKF_Paper"
+target "https://magiccvs.byu.edu/gitlab/superjax/vi_ekf_paper"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Landmark Propagation
+\end_layout
+
+\begin_layout Standard
+From the paper, we note that we propagate the Kalman filter with the boxplus
+ operator
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}\left(t+dt\right)=\hat{\boldsymbol{x}}\left(t\right)\boxplus f\left(\hat{\boldsymbol{x}}\left(t\right),\boldsymbol{u}\left(t\right)\right)dt.
+\end{equation}
+
+\end_inset
+
+Our estimated state will be given by 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\begin{bmatrix}\boldsymbol{q}_{c}^{\zeta_{1}}\rho_{1}\dots\boldsymbol{q}_{c}^{\zeta_{n}}\rho_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+First, let us just worry about propagating the landmark states, assuming
+ that the UAV motion is known.
+ For the landmarks, the only elements of 
+\begin_inset Formula $f$
+\end_inset
+
+ that we care about are
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}}.
+\end{equation}
+
+\end_inset
+
+Our inputs are denoted by 
+\begin_inset Formula $\boldsymbol{u}=\left[\boldsymbol{v}_{c/I}^{c},\boldsymbol{\omega}_{c/I}^{c}\right]$
+\end_inset
+
+, and the input noise is 
+\begin_inset Formula $\boldsymbol{\eta}=\begin{bmatrix}\boldsymbol{\eta}_{v}\boldsymbol{\eta}_{\omega}\end{bmatrix}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{c/I}^{c}=\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\omega}_{c/I}^{c}=\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}.
+\end{equation}
+
+\end_inset
+
+To propagate the quaternion, we must define the 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ operator for the quaternion unit vector.
+ 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{q}_{c}^{\zeta}\boxplus\boldsymbol{\delta}\triangleq\exp\left(T_{\zeta}\boldsymbol{\delta}\right)\otimes\boldsymbol{q}_{c}^{\zeta}
+\end{equation}
+
+\end_inset
+
+I think this means that 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\delta=\dot{\boldsymbol{q}}}_{c}^{\zeta}dt.
+\end{equation}
+
+\end_inset
+
+Now we need to define a few things
+\begin_inset Formula 
+\begin{equation}
+R\left(\boldsymbol{q}\right)=\left(2q_{0}^{2}-1\right)I-2q_{0}\bar{\boldsymbol{q}}^{\mathcircumflex}+2\bar{\boldsymbol{q}}\bar{\boldsymbol{q}}^{T}\in SO\left(3\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\zeta}_{i/c}^{c}=\left(R_{c}^{\zeta_{i}}\right)^{T}e_{3}\in S^{2}\subset\mathbb{R}^{3}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+T_{\zeta_{i}}=\left(R_{c}^{\zeta_{i}}\right)^{T}\left[e_{1}e_{2}\right]\in\mathbb{R}^{3\times2}
+\end{equation}
+
+\end_inset
+
+and finally
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\triangleq\begin{bmatrix}\cos\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\\
+\sin\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\frac{\boldsymbol{\delta}}{\parallel\boldsymbol{\delta}\parallel}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+or the small angle approximation
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\approx\begin{bmatrix}1\\
+\frac{\boldsymbol{\delta}}{2}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+For inverse depth it is pretty simple since 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ is the same as 
+\begin_inset Formula $+$
+\end_inset
+
+.
+ We have
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{equation}
+\rho_{i}\left(t+dt\right)=\rho_{i}+\dot{\rho}_{i}dt
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+EKF State Jacobians 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{x}}=\begin{bmatrix}F_{11} & F_{12} & \dots & 0\\
+F_{21} & F_{22} & \dots & 0\\
+0 & \dots & \ddots & \vdots\\
+0 & 0 & \dots & 0
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F_{11}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-T_{\zeta_{i}}^{T}\left[\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)^{\mathcircumflex}+\rho_{i}\left(\boldsymbol{v}_{c/I}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right]T_{\zeta_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{12}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\rho_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+F_{21}=\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-\rho_{i}^{2}\left(\boldsymbol{v}_{c/I}^{c}\right)^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{22}=\frac{\partial\dot{\rho_{i}}}{\partial\rho_{i}}=2\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+EKF Input Jacobians
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{u}}=\begin{bmatrix}G_{11} & G_{12}\\
+G_{21} & G_{22}\\
+\vdots & \vdots
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{11} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =T_{\zeta_{i}}^{T}\left(\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{12} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)\right)}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =T_{\zeta_{i}}^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{21} & =\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =-\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{22} & =\frac{\partial\dot{\rho}_{i}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =0
+\end{align}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Pixel Measurement Update
+\end_layout
+
+\begin_layout Standard
+We assume that we know the camera intrinsic values, namely the pixel location
+ of the camera's optical axis 
+\begin_inset Formula $\left(u_{0},v_{0}\right)$
+\end_inset
+
+ and the camera focal lengths 
+\begin_inset Formula $\left(f_{x},f_{y}\right)$
+\end_inset
+
+.
+ Now we assume that we can measure the landmark location in the camera frame.
+ The pinhole camera model can be written as
+\begin_inset Formula 
+\begin{equation}
+h_{\text{cam}}\left(\boldsymbol{x}\right)=\frac{1}{e_{3}^{T}\zeta^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\boldsymbol{\zeta}^{c}+\begin{bmatrix}u_{0}\\
+v_{0}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ The jacobian 
+\begin_inset Formula $\partial h_{\text{cam}}\slash\partial\boldsymbol{x}$
+\end_inset
+
+ of the camera measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+H_{\text{cam}}=\begin{bmatrix}H_{1} & 0 & \dots & H_{n} & 0\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+H_{i}=\frac{1}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\left(\frac{\boldsymbol{\zeta}_{i/c}^{c}e_{3}^{T}}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}-I_{3\times3}\right)\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}.
+\end{equation}
+
+\end_inset
+
+We use these equations to update our state
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}\boxminus h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+which I think is just
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}-h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+because the pixel measurements are 
+\begin_inset Formula $\in\mathbb{R}^{2}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Lie Algebra Estimating Constant Inertial Velocity of Target
+\end_layout
+
+\begin_layout Section
+State Vector
+\end_layout
+
+\begin_layout Standard
+We wish to estimate the inertial velocity of a moving target (moving at
+ approximately constant velocity).
+ We also wish to estimate our position relative to a point on the moving
+ target (referred to as the goal).
+ To improve these estimates, we will also estimate the locations of many
+ other visible features on the moving target.
+ Our estimated state vector will be given by:
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\begin{bmatrix}\boldsymbol{v}_{g/I}^{I}\boldsymbol{q}_{c}^{\zeta_{0}}\rho_{0}\dots\boldsymbol{q}_{c}^{\zeta_{n}}\rho_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+We assume that the goal frame is moving at near constant velocity.
+ Our inputs are denoted by 
+\begin_inset Formula $\boldsymbol{u}=\left[\boldsymbol{v}_{c/I}^{c},\boldsymbol{\omega}_{c/I}^{c}\right]$
+\end_inset
+
+, and the input noise is 
+\begin_inset Formula $\boldsymbol{\eta}=\begin{bmatrix}\boldsymbol{\eta}_{v}\boldsymbol{\eta}_{\omega}\end{bmatrix}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{c/I}^{c}=\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\omega}_{c/I}^{c}=\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}.
+\end{equation}
+
+\end_inset
+
+We observe that the velocity of the camera with respect to the goal frame,
+ expressed in the camera frame is given by
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{c/g}^{c}=\boldsymbol{v}_{c/I}^{c}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{R}_{I}^{c}$
+\end_inset
+
+ denotes the rotation from the inertial frame into the camera frame.
+ For the mean time we assume that the goal frame is not rotation with respect
+ to the inertial frame at all.
+ This also allows us to conclude that
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\omega}_{c/g}^{c}=\boldsymbol{\omega}_{c/I}^{c}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+State Propagation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{x}}=\begin{bmatrix}\boldsymbol{\dot{v}}_{g/I}^{I}\boldsymbol{\dot{q}}_{c}^{\zeta_{0}}\dot{\rho}_{0}\dots\boldsymbol{\dot{q}}_{c}^{\zeta_{n}}\dot{\rho}_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Velocity Propagation
+\end_layout
+
+\begin_layout Standard
+Since we assum constant velocity of the goal frame with respect to the inertial
+ frame (expressed in the inertial frame), the velocity states need no propagatio
+n.
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{v}}_{g/I}^{I}=\bar{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Landmark Propagation
+\end_layout
+
+\begin_layout Standard
+When the landmarks are static in the inertial frame, the landmark propagation
+ is defined by
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}.
+\end{equation}
+
+\end_inset
+
+However, since we assume that the landmarks are only static in the goal
+ frame, we instead write the landmark propagation as
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/g}^{c}.
+\end{equation}
+
+\end_inset
+
+To propagate these, we must define the 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ operator for the quaternion unit vector
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{q}_{c}^{\zeta}\boxplus\boldsymbol{\delta}\triangleq\exp\left(T_{\zeta}\boldsymbol{\delta}\right)\otimes\boldsymbol{q}_{c}^{\zeta}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\delta=\dot{\boldsymbol{q}}}_{c}^{\zeta}dt.
+\end{equation}
+
+\end_inset
+
+ Now we need to define a few things
+\begin_inset Formula 
+\begin{equation}
+R\left(\boldsymbol{q}\right)=\left(2q_{0}^{2}-1\right)I-2q_{0}\bar{\boldsymbol{q}}^{\mathcircumflex}+2\bar{\boldsymbol{q}}\bar{\boldsymbol{q}}^{T}\in SO\left(3\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\zeta}_{i/c}^{c}=\left(R_{c}^{\zeta_{i}}\right)^{T}e_{3}\in S^{2}\subset\mathbb{R}^{3}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+T_{\zeta_{i}}=\left(R_{c}^{\zeta_{i}}\right)^{T}\left[e_{1}e_{2}\right]\in\mathbb{R}^{3\times2}
+\end{equation}
+
+\end_inset
+
+and finally
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\triangleq\begin{bmatrix}\cos\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\\
+\sin\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\frac{\boldsymbol{\delta}}{\parallel\boldsymbol{\delta}\parallel}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+or the small angle approximation
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\approx\begin{bmatrix}1\\
+\frac{\boldsymbol{\delta}}{2}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ For inverse depth it is pretty simple since 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ is the same as 
+\begin_inset Formula $+$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\rho_{i}\left(t+dt\right)=\rho_{i}+\dot{\rho}_{i}dt.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+State Jacobians
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{x}}=\begin{bmatrix}0 & 0 & 0 & 0 & \dots & 0\\
+F_{21} & F_{22} & F_{23} & 0 & \dots & 0\\
+F_{31} & F_{32} & F_{33} & \vdots & \ddots & \vdots\\
+0 & 0 & 0 & 0 & \dots & F_{NN}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{11}=\frac{\delta\boldsymbol{\dot{v}}_{g/I}^{I}}{d\boldsymbol{x}}=\begin{bmatrix}0 & 0 & \dots & 0\end{bmatrix}(3xN)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+F_{21} & =\frac{\delta\boldsymbol{\dot{q}}_{c}^{\zeta_{0}}}{\delta\boldsymbol{v}_{g/I}^{I}}=\frac{\delta}{\delta\boldsymbol{v}_{g/I}^{I}}\left(-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}\right)\right)\\
+ & =\frac{\delta\boldsymbol{\dot{q}}_{c}^{\zeta_{0}}}{\delta\boldsymbol{v}_{g/I}^{I}}=\frac{\delta}{\delta\boldsymbol{v}_{g/I}^{I}}\left(-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{v}_{c/I}^{c}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)\right)\\
+ & =\frac{\delta\boldsymbol{\dot{q}}_{c}^{\zeta_{0}}}{\delta\boldsymbol{v}_{g/I}^{I}}=\frac{\delta}{\delta\boldsymbol{v}_{g/I}^{I}}\left(-T_{\zeta_{i}}^{T}\left(\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)\right)\\
+ & =\frac{\delta\boldsymbol{\dot{q}}_{c}^{\zeta_{0}}}{\delta\boldsymbol{v}_{g/I}^{I}}=\rho_{i}T_{\zeta_{i}}^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{R}_{I}^{c}(2x3)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{22}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-T_{\zeta_{i}}^{T}\left[\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}\right)^{\mathcircumflex}+\rho_{i}\left(\boldsymbol{v}_{c/g}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right]T_{\zeta_{i}}(2x2)?
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{23}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\rho_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}(2x1)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+F_{31} & =\frac{\delta\dot{\rho}_{i}}{\delta\boldsymbol{v}_{g/I}^{I}}=\frac{\delta}{\delta\boldsymbol{v}_{g/I}^{I}}\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/g}^{c}\right)\\
+ & =\frac{\delta\dot{\rho}_{i}}{\delta\boldsymbol{v}_{g/I}^{I}}=\frac{\delta}{\delta\boldsymbol{v}_{g/I}^{I}}\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\boldsymbol{v}_{c/I}^{c}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)\\
+ & =\frac{\delta\dot{\rho}_{i}}{\delta\boldsymbol{v}_{g/I}^{I}}=-\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{R}_{I}^{c}(1x3)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{32}=\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-\rho_{i}^{2}\left(\boldsymbol{v}_{c/g}^{c}\right)^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{33}=\frac{\partial\dot{\rho_{i}}}{\partial\rho_{i}}=2\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/g}^{c}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Input Jacobians
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{u}}=\begin{bmatrix}G_{11} & G_{12}\\
+G_{21} & G_{22}\\
+\vdots & \vdots
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{11} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =T_{\zeta_{i}}^{T}\left(\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{12} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)\right)}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =T_{\zeta_{i}}^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{21} & =\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =-\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{22} & =\frac{\partial\dot{\rho}_{i}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}-\boldsymbol{R}_{I}^{c}\boldsymbol{v}_{g/I}^{I}\right)\right)}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =0
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Measurement Updates
+\end_layout
+
+\begin_layout Subsection
+Pixel Measurements
+\end_layout
+
+\begin_layout Standard
+We assume that we know the camera intrinsic values, namely the pixel location
+ of the camera's optical axis 
+\begin_inset Formula $\left(u_{0},v_{0}\right)$
+\end_inset
+
+ and the camera focal lengths 
+\begin_inset Formula $\left(f_{x},f_{y}\right)$
+\end_inset
+
+.
+ Now we assume that we can measure the landmark location in the camera frame.
+ The pinhole camera model can be written as
+\begin_inset Formula 
+\begin{equation}
+h_{\text{cam}}\left(\boldsymbol{x}\right)=\frac{1}{e_{3}^{T}\zeta^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\boldsymbol{\zeta}^{c}+\begin{bmatrix}u_{0}\\
+v_{0}
+\end{bmatrix}.(2x1)
+\end{equation}
+
+\end_inset
+
+ The jacobian 
+\begin_inset Formula $\partial h_{\text{cam}}\slash\partial\boldsymbol{x}$
+\end_inset
+
+ of the camera measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+H_{\text{cam}}=\begin{bmatrix}0 & 0 & 0 & H_{0} & 0 & \dots & H_{n} & 0\end{bmatrix}(2xN)
+\end{equation}
+
+\end_inset
+
+where the first three zeros are for the velocity states and the other zeros
+ are for the inverse depth to the landmark (since the pixel is just a measuremen
+t of the angle from the camera frame to the landmark).
+\begin_inset Formula 
+\begin{equation}
+H_{i}=\frac{1}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\left(\frac{\boldsymbol{\zeta}_{i/c}^{c}e_{3}^{T}}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}-I_{3\times3}\right)\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}.(2x2)
+\end{equation}
+
+\end_inset
+
+We use these equations to update our state
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}\boxminus h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+which for the pixel measurement is just
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}-h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+because the pixel measurements are 
+\begin_inset Formula $\in\mathbb{R}^{2}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Depth Measurement
+\end_layout
+
+\begin_layout Standard
+If the goal frame is based on an ArUco tag, we can use the depth measurement
+ as a measurement of the distance between the camera frame and the goal
+ frame.
+ In this case, the measurement model is given by 
+\begin_inset Formula 
+\begin{equation}
+h_{\text{depth}}(\boldsymbol{x})=\frac{1}{\rho_{0}}.
+\end{equation}
+
+\end_inset
+
+The jacobian 
+\begin_inset Formula $\delta h_{\text{depth}}/\delta\boldsymbol{x}$
+\end_inset
+
+ of the goal depth measurement is given by
+\begin_inset Formula 
+\begin{equation}
+H_{\text{depth}}=\begin{bmatrix}0 & 0 & 0 & 0 & H_{0} & \dots & 0 & 0\end{bmatrix}(1xN)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+H_{0}=-\frac{1}{\rho_{0}^{2}}.
+\end{equation}
+
+\end_inset
+
+We update our state with
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}-h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+because the depth measurement is 
+\begin_inset Formula $\in\mathbb{R}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Velocity Measurement
+\end_layout
+
+\begin_layout Standard
+We can get measurements of the inertial velocity of the goal frame either
+ from GPS or from optical flow.
+ If these measurements originate from optical flow, the measurements are
+ inheritly in the camera frame, but if we know the orientation of the camera
+ frame w.r.t.
+ the inertial frame (i.e.
+ 
+\begin_inset Formula $\boldsymbol{R}_{c}^{I}$
+\end_inset
+
+) then we can rotate the measurements into the inertial frame.
+ In this case, the measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+h_{\text{velocity}}=\begin{bmatrix}\boldsymbol{v}_{g/I}^{I}\end{bmatrix}(3x1)
+\end{equation}
+
+\end_inset
+
+The jacobian 
+\begin_inset Formula $\delta h_{\text{depth}}/\delta\boldsymbol{x}$
+\end_inset
+
+ of the goal velocity measurement is given by
+\begin_inset Formula 
+\begin{equation}
+H_{\text{depth}}=\begin{bmatrix}I_{3x3} & 0 & \dots & 0\end{bmatrix}(3xN)
+\end{equation}
+
+\end_inset
+
+We update our state with
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}-h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+because the velocity measurements are 
+\begin_inset Formula $\in\mathbb{R}^{3}.$
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
