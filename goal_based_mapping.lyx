@@ -1,0 +1,3674 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Goal-Based Robocentric Mapping
+\end_layout
+
+\begin_layout Part
+2D Simulation Not Goal Based
+\end_layout
+
+\begin_layout Section
+Coordinate System
+\end_layout
+
+\begin_layout Standard
+In this example, we will deal with an inertial (world) cordinate frame,
+ 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ and a body-fixed (robocentric) coordinate frame, 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+.
+ We defines the robot's pose in 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+\emph{x}_{t}=\begin{bmatrix}x_{t}\\
+y_{t}\\
+\theta_{t}
+\end{bmatrix}.\label{eq:}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{t}$
+\end_inset
+
+ represent the coordiantes of the center of the robot in 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{t}$
+\end_inset
+
+ represent's the heading of the robot.
+ A positive value for 
+\begin_inset Formula $\theta_{t}$
+\end_inset
+
+ represents a positive rotation about the inertial frame's 
+\emph on
+z
+\emph default
+ axis.
+ When a robot has a heading value of 
+\begin_inset Formula $\theta_{t}=0$
+\end_inset
+
+, the robot's heading is perfectly aligned with the inertial frame's 
+\emph on
+x
+\emph default
+ axis.
+ 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is translated to have the origin at the center of the robot, and the 
+\emph on
+x
+\emph default
+-axis pointed out the heading of the robot.
+\end_layout
+
+\begin_layout Section
+Velocity Motion Model
+\end_layout
+
+\begin_layout Standard
+We assume that our 2D robot moves according to the 
+\emph on
+velocity motion model
+\emph default
+ (see 
+\emph on
+Probabilistic Robotics 
+\emph default
+section 5.3 pg.
+ 121).
+ With this motion model, we have two inputs 
+\begin_inset Formula 
+\begin{equation}
+u_{t}=\begin{bmatrix}v_{t}\\
+\omega_{t}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+ where 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ denotes the 
+\emph on
+translational velocity 
+\emph default
+at time 
+\emph on
+t
+\emph default
+ and 
+\begin_inset Formula $\omega_{t}$
+\end_inset
+
+ denotes the 
+\emph on
+rotational velocity
+\emph default
+ at time 
+\emph on
+t
+\emph default
+.
+\begin_inset Newline newline
+\end_inset
+
+Given a robot at time 
+\emph on
+t
+\emph default
+ with pose 
+\begin_inset Formula $x_{t}$
+\end_inset
+
+, input 
+\begin_inset Formula $u_{t}$
+\end_inset
+
+, the forward propagation of the motion model is defined by
+\begin_inset Formula 
+\begin{align}
+x_{t+1} & =x_{t}-\frac{v_{t}}{\omega_{t}}\sin\theta_{t}+\frac{v_{t}}{\omega_{t}}\sin(\theta_{t}+\omega_{t}\Delta t)\nonumber \\
+y_{t+1} & =y_{t}+\frac{v_{t}}{\omega_{t}}\cos\theta_{t}-\frac{v_{t}}{\omega_{t}}\cos(\theta_{t}+\omega_{t}\Delta t)\\
+\theta_{t+1} & =\theta_{t}+\omega_{t}\Delta t.\nonumber 
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+State Motion Model
+\end_layout
+
+\begin_layout Standard
+For each landmark in the environment that we are mapping, we have an associated
+ state vector
+\begin_inset Formula 
+\begin{equation}
+x_{i}=\begin{bmatrix}\phi_{i}\\
+d_{i}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\phi_{i}$
+\end_inset
+
+ represents the bearing angle to the landmark in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+, and 
+\begin_inset Formula $d_{i}$
+\end_inset
+
+ represents the distance from 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ to the landmark.
+ Using these definitions, the position of the goal in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}d_{i}\cos\phi_{i}\\
+d_{i}\sin\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Differentiation of a Vector
+\end_layout
+
+\begin_layout Standard
+The time derivative if a vector 
+\series bold
+p
+\series default
+ as seen in the world frame is defined here.
+ Let 
+\series bold
+p
+\series default
+ be moving in the robocentric frame and let the robocentric frame be rotating
+ with resepct to the world frame.
+ The time derivative of 
+\series bold
+p
+\series default
+ in the world frame is
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}\boldsymbol{p}=\frac{d}{dt_{b}}\boldsymbol{p}+\omega_{r/w}\times\boldsymbol{p}.
+\end{equation}
+
+\end_inset
+
+ The first term on the right-hand side is the motion of the vector 
+\series bold
+p 
+\series default
+as viewed from the rotating robocentric frame.
+ The second term represents the motion of 
+\series bold
+p
+\series default
+ due to the rotation of the robocentric frame relative to the world frame
+ which is 
+\begin_inset Formula $\omega_{r/w}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+IDK about this....
+\end_layout
+
+\begin_layout Standard
+The position of the landmark in frame 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is defined above as 
+\begin_inset Formula $p_{l_{i}}^{b}$
+\end_inset
+
+.
+ This is then used to define the vector from the goal to the vector as 
+\begin_inset Formula 
+\begin{equation}
+p_{r}^{b}=-p_{l_{i}}^{b}=\begin{bmatrix}-d_{i}\cos\phi_{i}\\
+-d_{i}\sin\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Solving equation 6 for what we are interested in yields
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\frac{d}{dt_{i}}p_{r}^{b}-\omega_{b/i}^{b}\times p_{r}^{b}.
+\end{equation}
+
+\end_inset
+
+For our 2D example, 
+\begin_inset Formula 
+\begin{equation}
+\omega_{b/i}^{b}=\begin{bmatrix}0\\
+0\\
+\omega
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\begin{bmatrix}d_{i}\dot{\phi_{i}}\sin\phi_{i}-\dot{d_{i}}\cos\phi_{i}\\
+-d_{i}\dot{\phi_{i}}\cos\phi_{i}-\dot{d_{i}}\sin\phi_{i}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}p_{r}^{b}=\begin{bmatrix}v\\
+0\\
+0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+We can separate out the values of 
+\begin_inset Formula $\dot{\phi_{i}}$
+\end_inset
+
+and 
+\begin_inset Formula $\dot{d_{i}}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\begin{bmatrix}d_{i}\sin\phi_{i} & -\cos\phi_{i}\\
+-d_{i}\cos\phi_{i} & -\sin\phi_{i}
+\end{bmatrix}\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Let 
+\begin_inset Formula 
+\begin{equation}
+A=\begin{bmatrix}d_{i}\sin\phi_{i} & -\cos\phi_{i}\\
+-d_{i}\cos\phi_{i} & -\sin\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Combining these equations yields
+\begin_inset Formula 
+\begin{align}
+A\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}v\\
+0\\
+0
+\end{bmatrix}-\begin{bmatrix}0\\
+0\\
+\omega
+\end{bmatrix}\times\begin{bmatrix}-d_{i}\cos\phi_{i}\\
+-d_{i}\sin\phi_{i}\\
+0
+\end{bmatrix}\\
+A\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}v-\omega d_{i}\sin\phi_{i}\\
+\omega d_{i}\cos\phi_{i}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+Since
+\begin_inset Formula 
+\begin{equation}
+A^{-1}=\begin{bmatrix}\frac{\sin\phi_{i}}{d_{i}} & -\frac{\cos\phi_{i}}{d_{i}}\\
+-\cos\phi_{i} & -\sin\phi_{i}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+then
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =A^{-1}\begin{bmatrix}v-\omega d_{i}\sin\phi_{i}\\
+\omega d_{i}\cos\phi_{i}
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}\frac{\sin\phi_{i}}{d_{i}} & -\frac{\cos\phi_{i}}{d_{i}}\\
+-\cos\phi_{i} & -\sin\phi_{i}
+\end{bmatrix}\begin{bmatrix}v-\omega d_{i}\sin\phi_{i}\\
+\omega d_{i}\cos\phi_{i}
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}\left(\frac{v\sin\phi_{i}}{d_{i}}-\omega\sin^{2}\phi_{i}\right)+\left(-\omega\cos^{2}\phi_{i}\right)\\
+\left(-v\cos\phi_{i}+\omega d_{i}\sin\phi_{i}\cos\phi_{i}\right)+\left(-\omega d_{i}\sin\phi_{i}\cos\phi_{i}\right)
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}\frac{v\sin\phi_{i}}{d_{i}}-\omega\\
+-v\cos\phi_{i}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+This result assumes constant velocities during each time step.
+\end_layout
+
+\begin_layout Subsection
+Diff of a vector (my way that makes sense)
+\end_layout
+
+\begin_layout Standard
+The position of the landmark in frame 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is defined above as 
+\begin_inset Formula $p_{l_{i}}^{b}$
+\end_inset
+
+.
+ Unlike above, we are going to leave it as it
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}d\cos\phi_{i}\\
+d\sin\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Solving equation 6 for what we are interested in yields
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\frac{d}{dt_{i}}p_{r}^{b}-\omega_{b/i}^{b}\times p_{r}^{b}.
+\end{equation}
+
+\end_inset
+
+For our 2D example, 
+\begin_inset Formula 
+\begin{equation}
+\omega_{b/i}^{b}=\begin{bmatrix}0\\
+0\\
+\omega
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\begin{bmatrix}-d_{i}\dot{\phi_{i}}\sin\phi_{i}+\dot{d_{i}}\cos\phi_{i}\\
+d_{i}\dot{\phi_{i}}\cos\phi_{i}+\dot{d_{i}}\sin\phi_{i}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}p_{r}^{b}=\begin{bmatrix}-v\\
+0\\
+0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+This is where we are different from Ferrin's derivation above.
+ We must think how the vector changes in the inertial frame and express
+ it in the body frame.
+ In this case, with a posivie velocity, the vector shrinks.
+ A positive velocity results in a shrinking vector.
+ We can separate out the values of 
+\begin_inset Formula $\dot{\phi_{i}}$
+\end_inset
+
+and 
+\begin_inset Formula $\dot{d_{i}}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}p_{r}^{b}=\begin{bmatrix}-d_{i}\sin\phi_{i} & \cos\phi_{i}\\
+d\cos\phi_{i} & \sin\phi_{i}
+\end{bmatrix}\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Let 
+\begin_inset Formula 
+\begin{equation}
+A=\begin{bmatrix}-d_{i}\sin\phi_{i} & \cos\phi_{i}\\
+d\cos\phi_{i} & \sin\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Combining these equations yields
+\begin_inset Formula 
+\begin{align}
+A\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}-v\\
+0\\
+0
+\end{bmatrix}-\begin{bmatrix}0\\
+0\\
+\omega
+\end{bmatrix}\times\begin{bmatrix}d\cos\phi_{i}\\
+d\sin\phi_{i}\\
+0
+\end{bmatrix}\\
+A\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}-v+\omega d_{i}\sin\phi_{i}\\
+-\omega d_{i}\cos\phi_{i}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+Since
+\begin_inset Formula 
+\begin{equation}
+A^{-1}=\begin{bmatrix}-\frac{\sin\phi_{i}}{d_{i}} & \frac{\cos\phi_{i}}{d_{i}}\\
+\cos\phi_{i} & \sin\phi_{i}
+\end{bmatrix},
+\end{equation}
+
+\end_inset
+
+then
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =A^{-1}\begin{bmatrix}-v+\omega d_{i}\sin\phi_{i}\\
+-\omega d_{i}\cos\phi_{i}
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}-\frac{\sin\phi_{i}}{d_{i}} & \frac{\cos\phi_{i}}{d_{i}}\\
+\cos\phi_{i} & \sin\phi_{i}
+\end{bmatrix}\begin{bmatrix}-v+\omega d_{i}\sin\phi_{i}\\
+-\omega d_{i}\cos\phi_{i}
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}\left(\frac{v\sin\phi_{i}}{d_{i}}-\omega\sin^{2}\phi_{i}\right)+\left(-\omega\cos^{2}\phi_{i}\right)\\
+\left(-v\cos\phi_{i}+\omega d_{i}\sin\phi_{i}\cos\phi_{i}\right)+\left(-\omega d_{i}\sin\phi_{i}\cos\phi_{i}\right)
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{d_{i}}
+\end{bmatrix} & =\begin{bmatrix}\frac{v\sin\phi_{i}}{d_{i}}-\omega\\
+-v\cos\phi_{i}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+And thus, we get the same result as Ferrin's way shown in the previous section.
+\end_layout
+
+\begin_layout Subsection
+Conversion to 
+\begin_inset Formula $\rho$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We parameterize depth as inverse-depth to make the equations more linear.
+\begin_inset Formula 
+\begin{equation}
+d=\frac{1}{\rho}
+\end{equation}
+
+\end_inset
+
+Taking the time derivative of the above equation yields
+\begin_inset Formula 
+\begin{equation}
+\dot{d}=-\frac{\dot{\rho}}{\rho^{2}}.
+\end{equation}
+
+\end_inset
+
+We use this relationship to convert equation 20 to an inverse-depth relationship
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\phi_{i}}\\
+\dot{\rho_{i}}
+\end{bmatrix}=\begin{bmatrix}v\rho_{i}\sin\phi_{i}-\omega\\
+v\rho_{i}^{2}\cos\phi_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Extended Kalman Filter
+\end_layout
+
+\begin_layout Standard
+We use an EKF to estimate the location of each landmark in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+at each time step.
+ The equations used are given here (following the notation from 
+\emph on
+Probabilistic Robotics
+\emph default
+).
+ Notably,
+\begin_inset Formula 
+\begin{align*}
+\mu & =\text{Mean of predicted probability distribution}\\
+\Sigma & =\text{Covariance of predicted probability distribution}\\
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Propagation
+\end_layout
+
+\begin_layout Standard
+Given 
+\begin_inset Formula $\mu_{t-1}$
+\end_inset
+
+, 
+\begin_inset Formula $u_{t}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+, the discrete time motion equations (derived above) are
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\phi_{t}\\
+\rho_{t}
+\end{bmatrix}=\begin{bmatrix}\phi_{t-1}+\left(v_{t}\rho_{t-1}\sin\phi_{t-1}-\omega_{t}\right)\Delta t\\
+\rho_{t-1}+\left(v_{t}\rho_{t-1}^{2}\cos\phi_{t-1}\right)\Delta t
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+Jacobian of the motion model with respect to the state is given as
+\begin_inset Formula 
+\begin{equation}
+G_{t}=\begin{bmatrix}1+\left(v_{t}\rho_{t-1}\cos\phi_{t-1}\right)\Delta t & \left(v_{t}\sin\phi_{t-1}\right)\Delta t\\
+\left(-v_{t}\rho_{t-1}^{2}\sin\phi_{t-1}\right)\Delta t & 1+\left(2v_{t}\rho_{t-1}\cos\phi_{t-1}\right)\Delta t
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+If we want to parameterize the noise with respect to the inputs, we can
+ update the covariance as
+\begin_inset Formula 
+\begin{equation}
+\bar{\Sigma_{t}}=G_{t}\Sigma_{t-1}G_{t}^{T}+V_{t}M_{t}V_{t}^{T}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+M_{t}=\begin{bmatrix}\alpha_{1}v_{t}^{2}+\alpha_{2}\omega_{t}^{2} & 0\\
+0 & \alpha_{3}v_{t}^{2}+\alpha_{4}\omega_{t}^{2}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $V_{t}$
+\end_inset
+
+, the jacobian of the motion model with respect to the inputs
+\begin_inset Formula 
+\begin{equation}
+V_{t}=\begin{bmatrix}\left(\rho_{t-1}\sin\phi_{t-1}\right)\Delta t & -\Delta t\\
+\left(\rho_{t-1}^{2}\cos\phi_{t-1}\right)\Delta t & 0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Measurement Update
+\end_layout
+
+\begin_layout Standard
+We assume that we can only measure the bearing to each landmark.
+ No information about the range to each landmark is used.
+ Since we only have one measurement per landmark, the noise matrix is given
+ as a single value comptued as
+\begin_inset Formula 
+\begin{equation}
+Q_{t}=\sigma_{b}^{2}.
+\end{equation}
+
+\end_inset
+
+The measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+\hat{z_{t}^{i}}=\phi_{t}^{i}
+\end{equation}
+
+\end_inset
+
+and therefore, the Jacobian of the measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+H_{t}^{i}=\begin{bmatrix}1 & 0\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+We use these equations to update our estimates with
+\begin_inset Formula 
+\begin{equation}
+S_{t}^{i}=H_{t}^{i}\bar{\Sigma_{t}}\left[H_{t}^{i}\right]^{T}+Q_{t}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+K_{t}^{i}=\bar{\Sigma_{t}}\left[H_{t}^{i}\right]^{T}\left[S_{t}^{i}\right]^{-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\bar{\mu_{t}}=\bar{\mu_{t}}+K_{t}^{i}\left(z_{t}^{i}-\hat{z}_{t}^{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\bar{\Sigma_{t}}=\left(I-K_{t}^{i}H_{t}^{i}\right)\bar{\Sigma}_{t}.
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Simulation Specific 
+\end_layout
+
+\begin_layout Subsection
+Simulated Measurements
+\end_layout
+
+\begin_layout Standard
+Given a robot at a given pose 
+\begin_inset Formula $x_{t},$
+\end_inset
+
+
+\begin_inset Formula $y_{t}$
+\end_inset
+
+, and 
+\begin_inset Formula $\theta_{t}$
+\end_inset
+
+ and a landmark at a given position 
+\begin_inset Formula $x_{l_{i}},$
+\end_inset
+
+
+\begin_inset Formula $y_{l_{i}}$
+\end_inset
+
+, the equation to compute the bearing angle is as follows
+\begin_inset Formula 
+\begin{align}
+\alpha_{i} & =\emph{atan2 \ensuremath{\left(y_{l_{i}}-y_{t},\,x_{l_{i}}-x_{t}\right)} }\\
+\hat{\phi}_{i} & =\alpha_{i}-\theta_{t}
+\end{align}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Part
+UAV Simulation (not goal based)
+\end_layout
+
+\begin_layout Standard
+We will reuse a lot of the same notation defined in the previous Part.
+\end_layout
+
+\begin_layout Section
+Coordinate System
+\end_layout
+
+\begin_layout Standard
+In this example, we will deal with an inertial (North-East-Down) cordinate
+ frame, 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ and a body-fixed (robocentric) coordinate frame, 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+.
+ We defines the robot's pose in 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+\emph{x}_{t}=\begin{bmatrix}n_{t}\\
+e_{t}\\
+d_{t}\\
+\phi_{t}\\
+\theta_{t}\\
+\psi_{t}
+\end{bmatrix}.\label{eq:-1}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\left(n_{t},e_{t},d_{t}\right)^{T}$
+\end_inset
+
+ represents the coordiantes of the center of the robot in 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(\phi_{t},\theta_{t},\psi_{t}\right)^{T}$
+\end_inset
+
+ represents the orientation of the robot (roll, pitch, yaw repectively).
+ The body-fixed frame, 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+, is a forward-right-down frame such that when 
+\begin_inset Formula $x_{t}=\bar{0}$
+\end_inset
+
+, 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+and 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+are perfectly aligned.
+\end_layout
+
+\begin_layout Standard
+Due to the UAV having a camera pointing down, we introduce the camera frame,
+ 
+\begin_inset Formula $\mathscr{F}^{c}$
+\end_inset
+
+, that is assumed to be aligned with 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ execpt that the x-axis points to the right, y-axis back and z-axis down.
+\end_layout
+
+\begin_layout Section
+Velocity Motion Model
+\end_layout
+
+\begin_layout Standard
+We assume that our UAV moves according to the motion model derived in 
+\emph on
+Quadrotor Dynamics and Control Rev 0.1 
+\emph default
+by Dr.
+ Beard.
+ We simply this model, assuming that we can measure linear and angular velocitie
+s.
+ We treat these velocities as our inputs, giving us 
+\begin_inset Formula 
+\begin{equation}
+u_{t}=\begin{bmatrix}u_{t}\\
+v_{t}\\
+w_{t}\\
+p_{t}\\
+q_{t}\\
+r_{t}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ Here 
+\begin_inset Formula $\left(u_{t},v_{t},w_{t}\right)^{T}$
+\end_inset
+
+represent the linear velocities of the UAV expressed in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+and 
+\begin_inset Formula $\left(p_{t},q_{t},r_{t}\right)^{T}$
+\end_inset
+
+represents the angular velocities of the UAV expressed in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+.
+ Using this input, our state evolves according to the equations
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{p_{n}}\\
+\dot{p_{e}}\\
+\dot{p_{d}}
+\end{bmatrix} & =\begin{bmatrix}c_{\theta}c_{\psi} & s_{\phi}s_{\theta}c_{\psi}-c_{\phi}s_{\psi} & c_{\phi}s_{\theta}c_{\psi}+s_{\phi}s_{\psi}\\
+c_{\theta}s_{\psi} & s_{\phi}s_{\theta}s_{\psi}+c_{\phi}c_{\psi} & c_{\phi}s_{\theta}s_{\psi}-s_{\phi}c_{\psi}\\
+-s_{\theta} & s_{\phi}c_{\theta} & c_{\phi}c_{\theta}
+\end{bmatrix}\begin{bmatrix}u\\
+v\\
+w
+\end{bmatrix},\\
+\begin{bmatrix}\dot{\phi}\\
+\dot{\theta}\\
+\dot{\psi}
+\end{bmatrix} & =\begin{bmatrix}1 & \sin\phi\tan\theta & \cos\phi\tan\theta\\
+0 & \cos\phi & -\sin\phi\\
+0 & \frac{\sin\phi}{\cos\theta} & \frac{\cos\phi}{\cos\theta}
+\end{bmatrix}\begin{bmatrix}p\\
+q\\
+r
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+State Motion Model
+\end_layout
+
+\begin_layout Standard
+For each landmark, we estimate 3 states to fully define the landmark in
+ the environment.
+ These states,
+\begin_inset Formula 
+\begin{equation}
+x_{l_{i}}=\begin{bmatrix}\alpha_{l_{i}}\\
+\beta_{l_{i}}\\
+\rho_{l_{i}}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+are defined as such.
+ The angle 
+\begin_inset Formula $\alpha_{i}$
+\end_inset
+
+is the angle from the 
+\begin_inset Formula $\hat{k}$
+\end_inset
+
+vector rotating around the positive 
+\begin_inset Formula $\hat{j}$
+\end_inset
+
+axis.
+ The angle 
+\begin_inset Formula $\beta_{l_{i}}$
+\end_inset
+
+is the angle from the 
+\begin_inset Formula $\hat{i},\hat{k}$
+\end_inset
+
+ plane, rotating around the negative 
+\begin_inset Formula $\hat{i}$
+\end_inset
+
+ axis.
+ The depth from 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ to the landmark is parameterized in 
+\begin_inset Formula $\rho_{l_{i}}$
+\end_inset
+
+as 
+\begin_inset Formula 
+\begin{equation}
+\rho_{l_{i}}=\frac{1}{d_{l_{i}}}.
+\end{equation}
+
+\end_inset
+
+These definitions are depicted in the images below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename images/estimation_frame.png
+	lyxscale 25
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using these definitions, the position of landmark 
+\emph on
+i
+\emph default
+ in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}\frac{1}{\rho_{l_{i}}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\sin\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+To simplify the math, we will temporarily reparameterize from inverse-depth
+ to normal depth so that
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}d_{l_{i}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+d_{l_{i}}\sin\beta_{l_{i}}\\
+d_{l_{i}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Differentiation of a vector
+\end_layout
+
+\begin_layout Standard
+We wish to solve for the time derivative of vector 
+\begin_inset Formula $p_{l_{i}}^{b}$
+\end_inset
+
+.
+ To do so, let 
+\begin_inset Formula $p$
+\end_inset
+
+be moving in frame 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+and let 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+be moving and rotating with respect to 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+.
+ The time derivative of 
+\begin_inset Formula $p$
+\end_inset
+
+ in frame 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+is 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}\boldsymbol{p}=\frac{d}{dt_{b}}\boldsymbol{p}+\omega_{b/i}\times\boldsymbol{p}.
+\end{equation}
+
+\end_inset
+
+The first term on the right-hand side of the equation above is the motion
+ of the vector 
+\begin_inset Formula $\boldsymbol{p}$
+\end_inset
+
+as viewed from the rotating frame 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+.
+ The second term represents the motion of 
+\begin_inset Formula $\boldsymbol{p}$
+\end_inset
+
+ due to the rotation of 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ relative to 
+\begin_inset Formula $\mathscr{F}^{i}$
+\end_inset
+
+ which is 
+\begin_inset Formula $\omega_{b/i}$
+\end_inset
+
+.
+ If we express everything in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+then we get 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}\boldsymbol{p}_{l_{i}}^{b}=\frac{d}{dt_{b}}\boldsymbol{p}_{l_{i}}^{b}+\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b}.
+\end{equation}
+
+\end_inset
+
+Rearranging the equation yields
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}\boldsymbol{p}_{l_{i}}^{b}=\frac{d}{dt_{i}}\boldsymbol{p}_{l_{i}}^{b}-\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b}.
+\end{equation}
+
+\end_inset
+
+Some of these things are easily known like
+\begin_inset Formula 
+\begin{align}
+\omega_{b/i}^{b} & =\begin{bmatrix}p\\
+q\\
+r
+\end{bmatrix}\\
+\frac{d}{dt_{i}}\boldsymbol{p}_{l_{i}}^{b} & =\begin{bmatrix}-u\\
+-v\\
+-w
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+ If the landmark were moving, we could easily account for that here.
+ Something like
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{i}}\boldsymbol{p}_{l_{i}}^{b}=\begin{bmatrix}u_{l_{i}}^{b}-u\\
+v_{l_{i}}^{b}-v\\
+w_{l_{i}}^{b}-w
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Let us work first with the left-hand side of the equation where
+\begin_inset Formula 
+\begin{align}
+\frac{d}{dt_{b}}\boldsymbol{p}_{l_{i}}^{b} & =\begin{bmatrix}d\dot{\alpha}\cos\alpha\cos\beta-d\sin\alpha\dot{\beta}\sin\beta+\dot{d}\sin\alpha\cos\beta\\
+d\dot{\beta}\cos\beta+\dot{d}\sin\beta\\
+-d\dot{\alpha}\sin\alpha\cos\beta-d\cos\alpha\dot{\beta}\sin\beta+\dot{d}\cos\alpha\cos\beta
+\end{bmatrix}\\
+\frac{d}{dt_{b}}\boldsymbol{p}_{l_{i}}^{b} & =A\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix}\\
+A & =\begin{bmatrix}d\cos\alpha\cos\beta & -d\sin\alpha\sin\beta & \sin\alpha\cos\beta\\
+0 & d\cos\beta & \sin\beta\\
+-d\sin\alpha\cos\beta & -d\cos\alpha\sin\beta & \cos\alpha\cos\beta
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Finding 
+\begin_inset Formula $A^{-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First we must comput the matrix determinant
+\begin_inset Formula 
+\begin{align}
+\det A & =d^{2}\cos^{2}\alpha\cos^{3}\beta+d^{2}\sin^{2}\alpha\cos^{3}\beta+d^{2}\cos^{2}\alpha\sin^{2}\beta\cos\beta+d^{2}\sin^{2}\alpha\sin^{2}\beta\cos\beta\\
+\det A & =d^{2}\cos^{3}\beta+d^{2}\sin^{2}\beta\cos\beta\\
+\det A & =d^{2}\cos\beta
+\end{align}
+
+\end_inset
+
+Thus the inverse becomes
+\begin_inset Formula 
+\begin{align}
+A^{-1} & =\frac{1}{\det A}\begin{bmatrix}d\cos\alpha & 0 & -d\sin\alpha\\
+-d\sin\alpha\sin\beta\cos\beta & d\cos^{2}\beta & -d\cos\alpha\sin\beta\cos\beta\\
+d^{2}\sin\alpha\cos^{2}\beta & d^{2}\sin\beta\cos\beta & d^{2}\cos\alpha\cos^{2}\beta
+\end{bmatrix}\\
+A^{-1} & =\frac{1}{d^{2}\cos\beta}\begin{bmatrix}d\cos\alpha & 0 & -d\sin\alpha\\
+-d\sin\alpha\sin\beta\cos\beta & d\cos^{2}\beta & -d\cos\alpha\sin\beta\cos\beta\\
+d^{2}\sin\alpha\cos^{2}\beta & d^{2}\sin\beta\cos\beta & d^{2}\cos\alpha\cos^{2}\beta
+\end{bmatrix}\\
+A^{-1} & =\begin{bmatrix}\frac{\cos\alpha}{d\cos\beta} & 0 & \frac{-\sin\alpha}{d\cos\beta}\\
+\frac{-\sin\alpha\sin\beta}{d} & \frac{\cos\beta}{d} & \frac{-\cos\alpha\sin\beta}{d}\\
+\sin\alpha\cos\beta & \,\,\sin\beta & \,\,\cos\alpha\cos\beta
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Cross Product
+\end_layout
+
+\begin_layout Standard
+To solve the equation above, we must also comput the cross product
+\begin_inset Formula 
+\begin{equation}
+\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\omega_{b/i}^{b}=\begin{bmatrix}p\\
+q\\
+r
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}d_{l_{i}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+d_{l_{i}}\sin\beta_{l_{i}}\\
+d_{l_{i}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+I like the compute the cross product like this
+\begin_inset Formula 
+\begin{align}
+\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b} & =\begin{bmatrix}\hat{i} & \hat{j} & \hat{k}\\
+p & q & r\\
+d\sin\alpha\cos\beta & \,\,d\sin\beta & \,\,d\cos\alpha\cos\beta
+\end{bmatrix}\\
+\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b} & =\begin{bmatrix}dq\cos\alpha\cos\beta-dr\sin\beta\\
+-dp\cos\alpha\cos\beta+dr\sin\alpha\cos\beta\\
+dp\sin\beta-dq\sin\alpha\cos\beta
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Putting it together
+\end_layout
+
+\begin_layout Standard
+Going back to our equation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt_{b}}\boldsymbol{p}_{l_{i}}^{b}=\frac{d}{dt_{i}}\boldsymbol{p}_{l_{i}}^{b}-\omega_{b/i}^{b}\times\boldsymbol{p}_{l_{i}}^{b}
+\end{equation}
+
+\end_inset
+
+we can now fill in a lot
+\begin_inset Formula 
+\begin{equation}
+A\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix}=\begin{bmatrix}-u\\
+-v\\
+-w
+\end{bmatrix}-\begin{bmatrix}dq\cos\alpha\cos\beta-dr\sin\beta\\
+-dp\cos\alpha\cos\beta+dr\sin\alpha\cos\beta\\
+dp\sin\beta-dq\sin\alpha\cos\beta
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+We can simplify this to
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix} & =A^{-1}\begin{bmatrix}-u-dq\cos\alpha\cos\beta+dr\sin\beta\\
+-v+dp\cos\alpha\cos\beta-dr\sin\alpha\cos\beta\\
+-w-dp\sin\beta+dq\sin\alpha\cos\beta
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix} & =\begin{bmatrix}\frac{\cos\alpha}{d\cos\beta} & 0 & \frac{-\sin\alpha}{d\cos\beta}\\
+\frac{-\sin\alpha\sin\beta}{d} & \frac{\cos\beta}{d} & \frac{-\cos\alpha\sin\beta}{d}\\
+\sin\alpha\cos\beta & \,\,\sin\beta & \,\,\cos\alpha\cos\beta
+\end{bmatrix}\begin{bmatrix}-u-dq\cos\alpha\cos\beta+dr\sin\beta\\
+-v+dp\cos\alpha\cos\beta-dr\sin\alpha\cos\beta\\
+-w-dp\sin\beta+dq\sin\alpha\cos\beta
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+The above equations multiplied out results in
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix} & =\begin{bmatrix}\frac{\cos\alpha}{d\cos\beta}\left(-u-dq\cos\alpha\cos\beta+dr\sin\beta\right)+\frac{-\sin\alpha}{d\cos\beta}\left(-w-dp\sin\beta+dq\sin\alpha\cos\beta\right)\\
+\frac{-\sin\alpha\sin\beta}{d}\left(-u-dq\cos\alpha\cos\beta+dr\sin\beta\right)+\frac{\cos\beta}{d}\left(-v+dp\cos\alpha\cos\beta-dr\sin\alpha\cos\beta\right)+\frac{-\cos\alpha\sin\beta}{d}\left(-w-dp\sin\beta+dq\sin\alpha\cos\beta\right)\\
+\sin\alpha\cos\beta\left(-u-dq\cos\alpha\cos\beta+dr\sin\beta\right)+\sin\beta\left(-v+dp\cos\alpha\cos\beta-dr\sin\alpha\cos\beta\right)+\cos\alpha\cos\beta\left(-w-dp\sin\beta+dq\sin\alpha\cos\beta\right)
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix} & =\begin{bmatrix}\left(-u\frac{\cos\alpha}{d\cos\beta}-q\cos^{2}\alpha+r\sin\beta\frac{\cos\alpha}{\cos\beta}\right)+\left(w\frac{\sin\alpha}{d\cos\beta}+p\sin\beta\frac{\sin\alpha}{\cos\beta}-q\sin^{2}\alpha\right)\\
+\left(u\frac{\sin\alpha\sin\beta}{d}+q\cos\alpha\cos\beta\sin\alpha\sin\beta-r\sin\alpha\sin^{2}\beta\right)+\left(-v\frac{\cos\beta}{d}+p\cos\alpha\cos^{2}\beta-r\sin\alpha\cos^{2}\beta\right)+\left(w\frac{\cos\alpha\sin\beta}{d}+p\sin^{2}\beta\cos\alpha-q\sin\alpha\cos\alpha\sin\beta\cos\beta\right)\\
+\left(-u\sin\alpha\cos\beta-dq\sin\alpha\cos\alpha\cos^{2}\beta+dr\sin\alpha\cos\beta\sin\beta\right)+\left(-v\sin\beta+dp\cos\alpha\sin\beta\cos\beta-dr\sin\alpha\sin\beta\cos\beta\right)+\left(-w\cos\alpha\cos\beta-dp\cos\alpha\cos\beta\sin\beta+dq\sin\alpha\cos\alpha\cos^{2}\beta\right)
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{d}
+\end{bmatrix} & =\begin{bmatrix}-u\frac{\cos\alpha}{d\cos\beta}+w\frac{\sin\alpha}{d\cos\beta}+p\sin\beta\frac{\sin\alpha}{\cos\beta}-q+r\sin\beta\frac{\cos\alpha}{\cos\beta}\\
+u\frac{\sin\alpha\sin\beta}{d}-v\frac{\cos\beta}{d}+w\frac{\cos\alpha\sin\beta}{d}+p\cos\alpha-r\sin\alpha\\
+-u\sin\alpha\cos\beta-v\sin\beta-w\cos\alpha\cos\beta
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Conversion to 
+\begin_inset Formula $\rho$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we want to change the parameterization.
+ We will substitue
+\begin_inset Formula 
+\begin{equation}
+\rho=\frac{1}{d}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\dot{d}=-\frac{\rho}{\rho^{2}}.
+\end{equation}
+
+\end_inset
+
+This change results in
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{\rho}
+\end{bmatrix} & =\begin{bmatrix}-u\rho\frac{\cos\alpha}{\cos\beta}+w\rho\frac{\sin\alpha}{\cos\beta}+p\sin\beta\frac{\sin\alpha}{\cos\beta}-q+r\sin\beta\frac{\cos\alpha}{\cos\beta}\\
+u\rho\sin\alpha\sin\beta-v\rho\cos\beta+w\rho\cos\alpha\sin\beta+p\cos\alpha-r\sin\alpha\\
+u\rho^{2}\sin\alpha\cos\beta+v\rho^{2}\sin\beta+w\rho^{2}\cos\alpha\cos\beta
+\end{bmatrix}\\
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{\rho}
+\end{bmatrix} & =\begin{bmatrix}-u\rho\frac{\cos\alpha}{\cos\beta}+w\rho\frac{\sin\alpha}{\cos\beta}+p\sin\alpha\tan\beta-q+r\cos\alpha\tan\beta\\
+u\rho\sin\alpha\sin\beta-v\rho\cos\beta+w\rho\cos\alpha\sin\beta+p\cos\alpha-r\sin\alpha\\
+u\rho^{2}\sin\alpha\cos\beta+v\rho^{2}\sin\beta+w\rho^{2}\cos\alpha\cos\beta
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Extended Kalman Filter
+\end_layout
+
+\begin_layout Standard
+We use an EKF to estimate the location of each landmark in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+at each time step.
+ The equations used are given here (following the notation from 
+\emph on
+Probabilistic Robotics
+\emph default
+).
+ Notably,
+\begin_inset Formula 
+\begin{align*}
+\mu & =\text{Mean of predicted probability distribution}\\
+\Sigma & =\text{Covariance of predicted probability distribution}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Propagation
+\end_layout
+
+\begin_layout Standard
+Given 
+\begin_inset Formula $\mu_{t-1}$
+\end_inset
+
+, 
+\begin_inset Formula $u_{t}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+, the discrete time motion equations (derived above) are
+\begin_inset Formula 
+\begin{align}
+\mu_{t} & =\mu_{t-1}+\dot{\mu}_{t-1}\Delta t\\
+\dot{\mu}_{t-1} & =\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{\rho}
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Jacobian of the motion model (G)
+\end_layout
+
+\begin_layout Standard
+Jacobian of the motion model with respect to the state is given as
+\begin_inset Formula 
+\begin{equation}
+G_{t}=I+\left(\frac{d}{dx}\dot{\mu}_{t-1}\right)\Delta t.
+\end{equation}
+
+\end_inset
+
+The jacobian is defined by
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dx}\dot{\mu}_{t-1}=\begin{bmatrix}\frac{d}{d\alpha}\dot{\alpha} & \frac{d}{d\beta}\dot{\alpha} & \frac{d}{d\rho}\dot{\alpha}\\
+\frac{d}{d\alpha}\dot{\beta} & \frac{d}{d\beta}\dot{\beta} & \frac{d}{d\rho}\dot{\beta}\\
+\frac{d}{d\alpha}\dot{\rho} & \frac{d}{d\beta}\dot{\rho} & \frac{d}{d\rho}\dot{\rho}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+These terms are defined as follows
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\alpha}\dot{\alpha}=u\rho\frac{\sin\alpha}{\cos\beta}+w\rho\frac{\cos\alpha}{\cos\beta}+p\sin\beta\frac{\cos\alpha}{\cos\beta}-r\sin\beta\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\beta}\dot{\alpha}=-u\rho\cos\alpha\tan\beta\sec\beta+w\rho\sin\alpha\tan\beta\sec\beta+p\frac{\sin\alpha}{\cos^{2}\beta}+r\frac{\cos\alpha}{\cos^{2}\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\rho}\dot{\alpha}=-u\frac{\cos\alpha}{\cos\beta}+w\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\alpha}\dot{\beta}=u\rho\cos\alpha\sin\beta-w\rho\sin\alpha\sin\beta-p\sin\alpha-r\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\beta}\dot{\beta}=u\rho\sin\alpha\cos\beta+v\rho\sin\beta+w\rho\cos\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\rho}\dot{\beta}=u\sin\alpha\sin\beta-v\cos\beta+w\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\alpha}\dot{\rho}=u\rho^{2}\cos\alpha\cos\beta-w\rho^{2}\sin\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\beta}\dot{\rho}=-u\rho^{2}\sin\alpha\sin\beta+v\rho^{2}\cos\beta-w\rho^{2}\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{d\rho}\dot{\rho}=2u\rho\sin\alpha\cos\beta+2v\rho\sin\beta+2w\rho\cos\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Jacobian for noise
+\end_layout
+
+\begin_layout Standard
+If we want to parameterize the noise with respect to the inputs, we can
+ update the covariance as
+\begin_inset Formula 
+\begin{equation}
+\bar{\Sigma_{t}}=G_{t}\Sigma_{t-1}G_{t}^{T}+V_{t}M_{t}V_{t}^{T}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+M_{t}=\begin{bmatrix}\sigma_{u}^{2} & 0 & 0 & 0 & 0 & 0\\
+0 & \sigma_{v}^{2} & 0 & 0 & 0 & 0\\
+0 & 0 & \sigma_{w}^{2} & 0 & 0 & 0\\
+0 & 0 & 0 & \sigma_{p}^{2} & 0 & 0\\
+0 & 0 & 0 & 0 & \sigma_{q}^{2} & 0\\
+0 & 0 & 0 & 0 & 0 & \sigma_{r}^{2}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $V_{t}$
+\end_inset
+
+, the jacobian of the motion model with respect to the inputs
+\begin_inset Formula 
+\begin{equation}
+V_{t}=\left(\frac{d}{du}\dot{\mu}_{t-1}\right)\Delta t.
+\end{equation}
+
+\end_inset
+
+We define the terms of the jacobian to be 
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{du}\dot{\mu}_{t-1}=\begin{bmatrix}\frac{d}{du}\dot{\alpha} & \frac{d}{dv}\dot{\alpha} & \frac{d}{dw}\dot{\alpha} & \frac{d}{dp}\dot{\alpha} & \frac{d}{dq}\dot{\alpha} & \frac{d}{dr}\dot{\alpha}\\
+\frac{d}{du}\dot{\beta} & \frac{d}{dv}\dot{\beta} & \frac{d}{dw}\dot{\beta} & \frac{d}{dp}\dot{\beta} & \frac{d}{dq}\dot{\beta} & \frac{d}{dr}\dot{\beta}\\
+\frac{d}{du}\dot{\rho} & \frac{d}{dv}\dot{\rho} & \frac{d}{dw}\dot{\rho} & \frac{d}{dp}\dot{\rho} & \frac{d}{dq}\dot{\rho} & \frac{d}{dr}\dot{\rho}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{du}\dot{\alpha}=-\rho\frac{\cos\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dv}\dot{\alpha}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dw}\dot{\alpha}=\rho\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dp}\dot{\alpha}=\sin\beta\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dq}\dot{\alpha}=-1
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dr}\dot{\alpha}=\sin\beta\frac{\cos\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{du}\dot{\beta}=\rho\sin\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dv}\dot{\beta}=-\rho\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dw}\dot{\beta}=\rho\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dp}\dot{\beta}=\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dq}\dot{\beta}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dr}\dot{\beta}=-\sin\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{du}\dot{\rho}=\rho^{2}\sin\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dv}\dot{\rho}=\rho^{2}\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dw}\dot{\rho}=\rho^{2}\cos\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dp}\dot{\rho}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dq}\dot{\rho}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dr}\dot{\rho}=0
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Measurement Update
+\end_layout
+
+\begin_layout Standard
+The only measurement that we get from each landmark is from the camera mounted
+ to the UAV.
+ We assume that we can detect the landmark in the image and therefore can
+ measure the pixel location of the landmark in the image given by
+\begin_inset Formula 
+\begin{equation}
+z=\begin{bmatrix}p_{x}\\
+p_{y}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+The measurement noise is then given as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+Q_{t}=\begin{bmatrix}\sigma_{p_{x}}^{2} & 0\\
+0 & \sigma_{p_{y}}^{2}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Measurement Model
+\end_layout
+
+\begin_layout Standard
+To compute the measurement model, we must know the intrinsic parameters
+ of the camera 
+\begin_inset Formula $f_{x},f_{y},c_{x},c_{y}$
+\end_inset
+
+.
+ Where 
+\begin_inset Formula $\left(c_{x},c_{y}\right)$
+\end_inset
+
+ is the principal point of the camera in the image frame and 
+\begin_inset Formula $f_{x},f_{y}$
+\end_inset
+
+ are the focal lengths in pixels.
+ As stated above, we also make a simplifying assumption that the origin
+ of the camera frame, 
+\begin_inset Formula $\mathscr{F}^{c}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ are aligned.
+ We have previously shown that the vector pointing from 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ to landmark 
+\begin_inset Formula $i$
+\end_inset
+
+ can be expressed as 
+\begin_inset Formula 
+\begin{equation}
+p_{l_{i}}^{b}=\begin{bmatrix}\frac{1}{\rho_{l_{i}}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\sin\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ If we assume that the camera is pointing perfectly down w.r.t.
+ 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+, then we can express the rotation from 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ to 
+\begin_inset Formula $\mathscr{F}^{c}$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\begin{equation}
+R_{b}^{c}=\begin{bmatrix}\text{0} & 1 & 0\\
+-1 & 0 & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and the position of landmark 
+\begin_inset Formula $i$
+\end_inset
+
+ in 
+\begin_inset Formula $\mathscr{F}^{c}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{align}
+\boldsymbol{p}_{l_{i}}^{c} & =R_{b}^{c}\boldsymbol{p}_{l_{i}}^{b}\\
+\boldsymbol{p}_{l_{i}}^{c} & =\begin{bmatrix}\text{0} & 1 & 0\\
+-1 & 0 & 0\\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}\frac{1}{\rho_{l_{i}}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\sin\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}\\
+\boldsymbol{p}_{l_{i}}^{c} & =\begin{bmatrix}\frac{1}{\rho_{l_{i}}}\sin\beta_{l_{i}}\\
+-\frac{1}{\rho_{l_{i}}}\sin\alpha_{l_{i}}\cos\beta_{l_{i}}\\
+\frac{1}{\rho_{l_{i}}}\cos\alpha_{l_{i}}\cos\beta_{l_{i}}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+Following camera literature, we can project the landmark from the world
+ coordinates to the camera image 
+\begin_inset Formula 
+\begin{align}
+p_{x} & =f_{x}x'+c_{x}\\
+p_{y} & =f_{y}y'+c_{y}
+\end{align}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+x'=\frac{\boldsymbol{p}^{c}\hat{i}}{\boldsymbol{p}^{c}\hat{k}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+y'=\frac{\boldsymbol{p}^{c}\hat{j}}{\boldsymbol{p}^{c}\hat{k}}.
+\end{equation}
+
+\end_inset
+
+Putting this all together, the measurement model is given by
+\begin_inset Formula 
+\begin{align}
+\hat{z_{t}^{i}} & =\begin{bmatrix}\hat{p}_{x}\\
+\hat{p}_{y}
+\end{bmatrix}\\
+\hat{z_{t}^{i}} & =\begin{bmatrix}f_{x}\frac{\tan\beta}{\cos\alpha}+c_{x}\\
+-f_{y}\tan\alpha+c_{y}
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+and therefore, the Jacobian of the measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+H_{t}^{i}=\begin{bmatrix}f_{x}\tan\beta\sec\alpha\tan\alpha & \,\,f_{x}\sec\alpha\sec^{2}\beta & 0\\
+-f_{y}\sec^{2}\alpha & 0 & 0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+We use these equations to update our estimates with
+\begin_inset Formula 
+\begin{equation}
+S_{t}^{i}=H_{t}^{i}\bar{\Sigma_{t}}\left[H_{t}^{i}\right]^{T}+Q_{t}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+K_{t}^{i}=\bar{\Sigma_{t}}\left[H_{t}^{i}\right]^{T}\left[S_{t}^{i}\right]^{-1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\bar{\mu_{t}}=\bar{\mu_{t}}+K_{t}^{i}\left(z_{t}^{i}-\hat{z}_{t}^{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\bar{\Sigma_{t}}=\left(I-K_{t}^{i}H_{t}^{i}\right)\bar{\Sigma}_{t}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Inverse Measurement Model
+\end_layout
+
+\begin_layout Standard
+We also derive the inverse measurement model here.
+ The inverse measurement model can be used to intiialize our states based
+ on our first observations.
+ We can first solve for 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ by taking 
+\begin_inset Formula 
+\begin{equation}
+p_{y}=-f_{y}\tan\alpha+c_{y}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\tan\alpha=-\frac{\left(p_{y}-c_{y}\right)}{f_{y}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\alpha=\tan^{-1}\left(\frac{c_{y}-p_{y}}{f_{y}}\right).
+\end{equation}
+
+\end_inset
+
+Using 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, we can then solve for 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+p_{x}=f_{x}\frac{\tan\beta}{\cos\alpha}+c_{x}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\tan\beta=\frac{p_{x}-c_{x}}{f_{x}}\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\beta=\tan^{-1}\left(\frac{p_{x}-c_{x}}{f_{x}}\cos\alpha\right).
+\end{equation}
+
+\end_inset
+
+Since depth is not observable from a single camera image, we have no equation
+ for it here.
+\end_layout
+
+\begin_layout Part
+Goal-Based Robocentric Mapping
+\end_layout
+
+\begin_layout Standard
+The equations derived in this part will be very similar to those derived
+ above.
+ The only key change is how the landmarks are parameterized.
+ We estimate the position of a goal and several landmarks giving our estimated
+ state vector as 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\left[\boldsymbol{x}_{g},\boldsymbol{x}_{l_{1}},\boldsymbol{x}_{l_{2}},...,\boldsymbol{x}_{l_{n}}\right]
+\end{equation}
+
+\end_inset
+
+for 
+\begin_inset Formula $n$
+\end_inset
+
+ landmarks estimated.
+ In this goal-based parameterization, the goal state remains the same as
+ above, specifically, 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}_{g}=\begin{bmatrix}\alpha\\
+\beta\\
+\rho_{g}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+However, the landmark states now become 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}_{l_{i}}=\begin{bmatrix}\theta_{i}\\
+\eta_{i}\\
+\rho_{i}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\gamma_{i}=\alpha+\theta_{i}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\lambda_{i}=\beta+\eta_{i}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+and 
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+are equivalent to the goal's 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ angles.
+ Given this, we can show that the goal expressed in 
+\begin_inset Formula $\mathscr{F}^{b}$
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{p}_{g}^{b}=\begin{bmatrix}\frac{1}{\rho_{g}}\sin\alpha\cos\beta\\
+\frac{1}{\rho_{g}}\sin\beta\\
+\frac{1}{\rho_{g}}\cos\alpha\cos\beta
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and landmark 
+\begin_inset Formula $i$
+\end_inset
+
+ can be expressed as 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{p}_{l_{i}}^{b}=\begin{bmatrix}\frac{1}{\rho_{l_{i}}}\sin\gamma_{i}\cos\lambda_{i}\\
+\frac{1}{\rho_{l_{i}}}\sin\lambda_{i}\\
+\frac{1}{\rho_{l_{i}}}\cos\gamma_{i}\cos\lambda_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Motion Model
+\end_layout
+
+\begin_layout Standard
+The motion model for the goal states remains the same,
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\alpha}\\
+\dot{\beta}\\
+\dot{\rho_{g}}
+\end{bmatrix}=\begin{bmatrix}-u\rho_{g}\frac{\cos\alpha}{\cos\beta}+w\rho_{g}\frac{\sin\alpha}{\cos\beta}+p\sin\alpha\tan\beta-q+r\cos\alpha\tan\beta\\
+u\rho_{g}\sin\alpha\sin\beta-v\rho_{g}\cos\beta+w\rho_{g}\cos\alpha\sin\beta+p\cos\alpha-r\sin\alpha\\
+u\rho_{g}^{2}\sin\alpha\cos\beta+v\rho_{g}^{2}\sin\beta+w\rho_{g}^{2}\cos\alpha\cos\beta
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ However, the motion model for the landmark states changes due to the substituti
+ons
+\begin_inset Formula 
+\begin{equation}
+\theta_{i}=\gamma_{i}-\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\eta_{i}=\lambda_{i}-\beta
+\end{equation}
+
+\end_inset
+
+so that we can express
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\gamma_{i}}\\
+\dot{\lambda_{i}}\\
+\dot{\rho_{l_{i}}}
+\end{bmatrix}=\begin{bmatrix}-u\rho_{l_{i}}\frac{\cos\gamma_{i}}{\cos\lambda_{i}}+w\rho_{l_{i}}\frac{\sin\gamma_{i}}{\cos\lambda_{i}}+p\sin\gamma_{i}\tan\lambda_{i}-q+r\cos\gamma_{i}\tan\lambda_{i}\\
+u\rho_{l_{i}}\sin\gamma_{i}\sin\lambda_{i}-v\rho_{l_{i}}\cos\lambda_{i}+w\rho_{l_{i}}\cos\gamma_{i}\sin\lambda_{i}+p\cos\gamma_{i}-r\sin\gamma_{i}\\
+u\rho_{l_{i}}^{2}\sin\gamma_{i}\cos\lambda_{i}+v\rho_{l_{i}}^{2}\sin\lambda_{i}+w\rho_{l_{i}}^{2}\cos\gamma_{i}\cos\lambda_{i}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+For sake of simplicity, we make the substitution and show that 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\theta}_{i}\\
+\dot{\eta}_{i}\\
+\dot{\rho}_{l_{i}}
+\end{bmatrix}=\begin{bmatrix}\dot{\gamma}_{i}-\dot{\alpha}\\
+\dot{\lambda}_{i}-\dot{\beta}\\
+\dot{\rho}_{l_{i}}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\theta}_{i}\\
+\dot{\eta}_{i}\\
+\dot{\rho}_{l_{i}}
+\end{bmatrix}=\begin{bmatrix}\left(-u\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+w\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+p\sin\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)-q+r\cos\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)\right)-\left(-u\rho_{g}\frac{\cos\alpha}{\cos\beta}+w\rho_{g}\frac{\sin\alpha}{\cos\beta}+p\sin\alpha\tan\beta-q+r\cos\alpha\tan\beta\right)\\
+\left(u\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-v\rho_{l_{i}}\cos\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)+p\cos\left(\alpha+\theta_{i}\right)-r\sin\left(\alpha+\theta_{i}\right)\right)-\left(u\rho_{g}\sin\alpha\sin\beta-v\rho_{g}\cos\beta+w\rho_{g}\cos\alpha\sin\beta+p\cos\alpha-r\sin\alpha\right)\\
+u\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)+v\rho_{l_{i}}^{2}\sin\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+State Jacobian
+\end_layout
+
+\begin_layout Standard
+The overall state jacobian Gt changes significantly.
+ If we say that 
+\begin_inset Formula 
+\begin{equation}
+G_{t}=I+\left(\frac{d}{dx}\dot{\mu}_{t-1}\right)\Delta t
+\end{equation}
+
+\end_inset
+
+as above, then
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dx}\dot{\mu}_{t-1}=\begin{bmatrix}G_{g} & 0 & 0 & \dots & 0\\
+G_{1,g} & G_{1,1} & 0 & \dots & 0\\
+G_{2,g} & 0 & G_{2,2} & \dots & 0\\
+\vdots & \vdots & 0 & \ddots & 0\\
+G_{N,g} & 0 & \dots & 0 & G_{N,N}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+The matrix 
+\begin_inset Formula $G_{g}$
+\end_inset
+
+ is the same as the jacobian matrix defined in the previous part (non goal
+ based).
+ However, 
+\begin_inset Formula $G_{N,g}$
+\end_inset
+
+ and 
+\begin_inset Formula $G_{N,N}$
+\end_inset
+
+ are unique to this parameterization.
+ They are defined below.
+\begin_inset Formula 
+\begin{equation}
+G_{N,g}=\begin{bmatrix}\frac{d\dot{\theta}_{i}}{d\alpha} & \frac{d\dot{\theta}_{i}}{d\beta} & \frac{d\dot{\theta_{i}}}{d\rho_{g}}\\
+\frac{d\dot{\eta_{i}}}{d\alpha} & \frac{d\dot{\eta_{i}}}{d\beta} & \frac{d\dot{\eta_{i}}}{d\rho_{g}}\\
+\frac{d\dot{\rho_{l_{i}}}}{d\alpha} & \frac{d\dot{\rho_{l_{i}}}}{d\beta} & \frac{d\dot{\rho_{l_{i}}}}{d\rho_{g}}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\theta}_{i}}{d\alpha} & =\left(u\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+w\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+p\cos\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)-r\sin\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)\right)\\
+ & -\left(u\rho_{g}\frac{\sin\alpha}{\cos\beta}+w\rho_{g}\frac{\cos\alpha}{\cos\beta}+p\cos\alpha\tan\beta-r\sin\alpha\tan\beta\right)\nonumber 
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\theta}_{i}}{d\beta} & =\left(-u\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}\tan\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}\tan\left(\beta+\eta_{i}\right)+p\sin\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right)+r\cos\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right)\right)\\
+ & -\left(-u\rho_{g}\frac{\cos\alpha}{\cos\beta}\tan\beta+w\rho_{g}\frac{\sin\alpha}{\cos\beta}\tan\beta+p\sin\alpha\sec^{2}\beta+r\cos\alpha\sec^{2}\beta\right)\nonumber 
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\theta_{i}}}{d\rho_{g}} & =u\frac{\cos\alpha}{\cos\beta}-w\frac{\sin\alpha}{\cos\beta}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\eta_{i}}}{d\alpha} & =\left(u\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-p\sin\left(\alpha+\theta_{i}\right)-r\cos\left(\alpha+\theta_{i}\right)\right)\\
+ & -\left(u\rho_{g}\cos\alpha\sin\beta-w\rho_{g}\sin\alpha\sin\beta-p\sin\alpha-r\cos\alpha\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\eta_{i}}}{d\beta} & =\left(u\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)+v\rho_{l_{i}}\sin\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)\right)\\
+ & -\left(u\rho_{g}\sin\alpha\cos\beta+v\rho_{g}\sin\beta+w\rho_{g}\cos\alpha\cos\beta\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\eta_{i}}}{d\rho_{g}}=-u\sin\alpha\sin\beta+v\cos\beta-w\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\alpha}=u\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\beta}=-u\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)+v\rho_{l_{i}}^{2}\cos\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\rho_{g}}=0
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+G_{N,N}=\begin{bmatrix}\frac{d\dot{\theta}_{i}}{d\theta_{i}} & \frac{d\dot{\theta}_{i}}{d\eta_{i}} & \frac{d\dot{\theta_{i}}}{d\rho_{l_{i}}}\\
+\frac{d\dot{\eta_{i}}}{d\theta_{i}} & \frac{d\dot{\eta_{i}}}{d\eta_{i}} & \frac{d\dot{\eta_{i}}}{d\rho_{l_{i}}}\\
+\frac{d\dot{\rho_{l_{i}}}}{d\theta_{i}} & \frac{d\dot{\rho_{l_{i}}}}{d\eta_{i}} & \frac{d\dot{\rho_{l_{i}}}}{d\rho_{l_{i}}}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{d\dot{\theta}_{i}}{d\theta_{i}} & =\left(u\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+w\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+p\cos\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)-r\sin\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\theta}_{i}}{d\eta_{i}}=\left(-u\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}\tan\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}\tan\left(\beta+\eta_{i}\right)+p\sin\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right)+r\cos\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right)\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\theta_{i}}}{d\rho_{l_{i}}}=-u\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+w\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\eta_{i}}}{d\theta_{i}}=\left(u\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-p\sin\left(\alpha+\theta_{i}\right)-r\cos\left(\alpha+\theta_{i}\right)\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\eta_{i}}}{d\eta_{i}}=\left(u\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)+v\rho_{l_{i}}\sin\left(\beta+\eta_{i}\right)+w\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\eta_{i}}}{d\rho_{l_{i}}}=\left(u\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-v\cos\left(\beta+\eta_{i}\right)+w\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\theta_{i}}=u\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\eta_{i}}=-u\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)+v\rho_{l_{i}}^{2}\cos\left(\beta+\eta_{i}\right)-w\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\dot{\rho_{l_{i}}}}{d\rho_{l_{i}}}=2u\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)+2v\rho_{l_{i}}\sin\left(\beta+\eta_{i}\right)+2w\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection
+Input Jacobian 
+\end_layout
+
+\begin_layout Standard
+For the process noise, we model the noise in the control space as
+\begin_inset Formula 
+\begin{equation}
+M_{t}=\begin{bmatrix}\sigma_{u}^{2} & 0 & 0 & 0 & 0 & 0\\
+0 & \sigma_{v}^{2} & 0 & 0 & 0 & 0\\
+0 & 0 & \sigma_{w}^{2} & 0 & 0 & 0\\
+0 & 0 & 0 & \sigma_{p}^{2} & 0 & 0\\
+0 & 0 & 0 & 0 & \sigma_{q}^{2} & 0\\
+0 & 0 & 0 & 0 & 0 & \sigma_{r}^{2}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+With this, we compute the process noise 
+\begin_inset Formula $R_{t}$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\begin{equation}
+R_{t}=V_{t}M_{t}V_{t}^{T}.
+\end{equation}
+
+\end_inset
+
+We can show that 
+\begin_inset Formula $V_{t}$
+\end_inset
+
+ is computed as 
+\begin_inset Formula 
+\begin{equation}
+V_{t}=\begin{bmatrix}\frac{d\boldsymbol{x}_{g}}{d\boldsymbol{u}}\\
+\frac{d\boldsymbol{x}_{l_{1}}}{d\boldsymbol{u}}\\
+\frac{d\boldsymbol{x}_{l_{2}}}{d\boldsymbol{u}}\\
+\vdots\\
+\frac{d\boldsymbol{x}_{l_{N}}}{d\boldsymbol{u}}
+\end{bmatrix}\Delta t
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\frac{d\boldsymbol{x}_{g}}{d\boldsymbol{u}}=\begin{bmatrix}\frac{\partial\dot{\alpha}}{\partial u} & \frac{\partial\dot{\alpha}}{\partial v} & \frac{\partial\dot{\alpha}}{\partial w} & \frac{\partial\dot{\alpha}}{\partial p} & \frac{\partial\dot{\alpha}}{\partial q} & \frac{\partial\dot{\alpha}}{\partial r}\\
+\frac{\partial\dot{\beta}}{\partial u} & \frac{\partial\dot{\beta}}{\partial v} & \frac{\partial\dot{\beta}}{\partial w} & \frac{\partial\dot{\beta}}{\partial p} & \frac{\partial\dot{\beta}}{\partial q} & \frac{\partial\dot{\beta}}{\partial r}\\
+\frac{\partial\dot{\rho}_{g}}{\partial u} & \frac{\partial\dot{\rho}_{g}}{\partial v} & \frac{\partial\dot{\rho}_{g}}{\partial w} & \frac{\partial\dot{\rho}_{g}}{\partial p} & \frac{\partial\dot{\rho}_{g}}{\partial q} & \frac{\partial\dot{\rho}_{g}}{\partial r}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial u}=-\rho_{g}\frac{\cos\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial v}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial w}=\rho_{g}\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial p}=\sin\alpha\tan\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial q}=-1
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\alpha}}{\partial r}=\cos\alpha\tan\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial u}=\rho_{g}\sin\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial v}=-\rho_{g}\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial w}=\rho_{g}\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial p}=\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial q}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\beta}}{\partial r}=-\sin\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial u}=\rho_{g}^{2}\sin\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial v}=\rho_{g}^{2}\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial w}=\rho_{g}^{2}\cos\alpha\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial p}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial q}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{g}}{\partial r}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d\boldsymbol{x}_{l_{i}}}{d\boldsymbol{u}}=\begin{bmatrix}\frac{\partial\dot{\theta}_{i}}{\partial u} & \frac{\partial\dot{\theta}_{i}}{\partial v} & \frac{\partial\dot{\theta}_{i}}{\partial w} & \frac{\partial\dot{\theta}_{i}}{\partial p} & \frac{\partial\dot{\theta}_{i}}{\partial q} & \frac{\partial\dot{\theta}_{i}}{\partial r}\\
+\frac{\partial\dot{\eta}_{i}}{\partial u} & \frac{\partial\dot{\eta}_{i}}{\partial v} & \frac{\partial\dot{\eta}_{i}}{\partial w} & \frac{\partial\dot{\eta}_{i}}{\partial p} & \frac{\partial\dot{\eta}_{i}}{\partial q} & \frac{\partial\dot{\eta}_{i}}{\partial r}\\
+\frac{\partial\dot{\rho}_{i}}{\partial u} & \frac{\partial\dot{\rho}_{i}}{\partial v} & \frac{\partial\dot{\rho}_{i}}{\partial w} & \frac{\partial\dot{\rho}_{i}}{\partial p} & \frac{\partial\dot{\rho}_{i}}{\partial q} & \frac{\partial\dot{\rho}_{i}}{\partial r}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial u}=-\rho_{l_{i}}\frac{\cos\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}+\rho_{g}\frac{\cos\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial v}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial w}=\rho_{l_{i}}\frac{\sin\left(\alpha+\theta_{i}\right)}{\cos\left(\beta+\eta_{i}\right)}-\rho_{g}\frac{\sin\alpha}{\cos\beta}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial p}=\sin\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)-\sin\alpha\tan\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial q}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\theta}_{i}}{\partial r}=\cos\left(\alpha+\theta_{i}\right)\tan\left(\beta+\eta_{i}\right)-\cos\alpha\tan\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial u}=\rho_{l_{i}}\sin\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-\rho_{g}\sin\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial v}=-\rho_{l_{i}}\cos\left(\beta+\eta_{i}\right)+\rho_{g}\cos\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial w}=\rho_{l_{i}}\cos\left(\alpha+\theta_{i}\right)\sin\left(\beta+\eta_{i}\right)-\rho_{g}\cos\alpha\sin\beta
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial p}=\cos\left(\alpha+\theta_{i}\right)-\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial q}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\eta}_{i}}{\partial r}=-\sin\left(\alpha+\theta_{i}\right)+\sin\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial u}=\rho_{l_{i}}^{2}\sin\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial v}=\rho_{l_{i}}^{2}\sin\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial w}=\rho_{l_{i}}^{2}\cos\left(\alpha+\theta_{i}\right)\cos\left(\beta+\eta_{i}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial p}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial q}=0
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\dot{\rho}_{i}}{\partial r}=0
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Measurement Model 
+\end_layout
+
+\begin_layout Standard
+As shown in the previous section, the measurement model for the goal state
+ can be written as 
+\begin_inset Formula 
+\begin{equation}
+\hat{z}_{g}=\begin{bmatrix}p_{x}\\
+p_{y}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\hat{z_{g}}=\begin{bmatrix}f_{x}\frac{\tan\beta}{\cos\alpha}+c_{x}\\
+-f_{y}\tan\alpha+c_{y}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+Following the same logic, the measurement model for the landmark states
+ can be written as
+\begin_inset Formula 
+\begin{equation}
+\hat{z}_{l_{i}}=\begin{bmatrix}f_{x}\frac{\tan\lambda_{i}}{\cos\gamma_{i}}+c_{x}\\
+-f_{y}\tan\gamma_{i}+c_{y}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\hat{z}_{l_{i}}=\begin{bmatrix}f_{x}\frac{\tan\left(\beta+\eta_{i}\right)}{\cos\left(\alpha+\theta_{i}\right)}+c_{x}\\
+-f_{y}\tan\left(\alpha+\theta_{i}\right)+c_{y}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Measurement Jacobians
+\end_layout
+
+\begin_layout Standard
+The measurement jacobian for measurements of the goal state is
+\begin_inset Formula 
+\begin{equation}
+H_{g}=\begin{bmatrix}\frac{\partial z_{g}}{\partial\boldsymbol{x}_{g}} & 0 & \dots & 0\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial z_{g}}{\partial\boldsymbol{x}_{g}}=\begin{bmatrix}f_{x}\tan\beta\sec\alpha\tan\alpha & \,\,f_{x}\sec\alpha\sec^{2}\beta & 0\\
+-f_{y}\sec^{2}\alpha & 0 & 0
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and for the landmarks is
+\begin_inset Formula 
+\begin{equation}
+H_{l_{i}=}\begin{bmatrix}\frac{\partial z_{l_{i}}}{\partial\boldsymbol{x}_{g}} & 0 & \dots & 0 & \frac{\partial z_{l_{i}}}{\partial\boldsymbol{x}_{l_{i}}} & 0 & \dots & 0\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+with
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial z_{l_{i}}}{\partial\boldsymbol{x}_{g}}=\begin{bmatrix}f_{x}\tan\left(\beta+\eta_{i}\right)\sec\left(\alpha+\theta_{i}\right)\tan\left(\alpha+\theta_{i}\right) & \,\,f_{x}\sec\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right) & 0\\
+-f_{y}\sec^{2}\left(\alpha+\theta_{i}\right) & 0 & 0
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial z_{l_{i}}}{\partial\boldsymbol{x}_{l_{i}}}=\begin{bmatrix}f_{x}\tan\left(\beta+\eta_{i}\right)\sec\left(\alpha+\theta_{i}\right)\tan\left(\alpha+\theta_{i}\right) & \,\,f_{x}\sec\left(\alpha+\theta_{i}\right)\sec^{2}\left(\beta+\eta_{i}\right) & 0\\
+-f_{y}\sec^{2}\left(\alpha+\theta_{i}\right) & 0 & 0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Inverse Measurement Model
+\end_layout
+
+\begin_layout Standard
+As in Part II, the inverse measurement model for the goal states is the
+ same
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p_{y}=-f_{y}\tan\alpha+c_{y}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\tan\alpha=-\frac{\left(p_{y}-c_{y}\right)}{f_{y}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\alpha=\tan^{-1}\left(\frac{c_{y}-p_{y}}{f_{y}}\right).
+\end{equation}
+
+\end_inset
+
+Using 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, we can then solve for 
+\begin_inset Formula $\beta$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+p_{x}=f_{x}\frac{\tan\beta}{\cos\alpha}+c_{x}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\tan\beta=\frac{p_{x}-c_{x}}{f_{x}}\cos\alpha
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\beta=\tan^{-1}\left(\frac{p_{x}-c_{x}}{f_{x}}\cos\alpha\right).
+\end{equation}
+
+\end_inset
+
+Given the goal states, 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+, we can solve for the landmark states
+\begin_inset Formula 
+\begin{equation}
+p_{y}^{i}=-f_{y}\tan\left(\alpha+\theta_{i}\right)+c_{y}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\tan\left(\alpha+\theta_{i}\right)=-\frac{\left(p_{y}^{i}-c_{y}\right)}{f_{y}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\theta_{i}=\tan^{-1}\left(\frac{c_{y}-p_{y}}{f_{y}}\right)-\alpha
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\eta_{i}=\tan^{-1}\left(\frac{p_{x}^{i}-c_{x}}{f_{x}}\cos\left(\alpha+\theta_{i}\right)\right)-\beta.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Estimating Velocities
+\end_layout
+
+\begin_layout Standard
+Now, suppose we cannot rely on an external estimator to feed us linear velocitie
+s.
+ We can use the same estimated state vector as above, prepended with the
+ linear velocities we must estimate.
+ The jacobians are just going to get really nasty.
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\begin{bmatrix}\boldsymbol{v} & \mu & \boldsymbol{x}_{g} & \boldsymbol{x}_{l_{1}} & \dots & \boldsymbol{x}_{l_{N}}\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}=\begin{bmatrix}u\\
+v\\
+w
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the linear drag term.
+ We can define the propagation equations as
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{u}\\
+\dot{v}\\
+\dot{w}
+\end{bmatrix}=\begin{bmatrix}-g\sin\theta+\left(vr-wq\right)-\frac{\mu}{m}u\\
+g\sin\phi\cos\theta+\left(wp-ur\right)-\frac{\mu}{m}v\\
+g\cos\phi\cos\theta+\left(uq-vp\right)-\frac{F}{m}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+For this, we also need to know 
+\begin_inset Formula $\phi$
+\end_inset
+
+, 
+\begin_inset Formula $\theta$
+\end_inset
+
+, so we should estimate them.
+ At the same time, we minus well estimate 
+\begin_inset Formula $\psi$
+\end_inset
+
+ as well.
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\dot{\phi}\\
+\dot{\theta}\\
+\dot{\psi}
+\end{bmatrix}=\begin{bmatrix}1 & \sin\phi\tan\theta & \cos\phi\tan\theta\\
+0 & \cos\phi & -\sin\phi\\
+0 & \frac{\sin\phi}{\cos\theta} & \frac{\cos\phi}{\cos\theta}
+\end{bmatrix}\begin{bmatrix}p\\
+q\\
+r
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Measurements
+\end_layout
+
+\begin_layout Standard
+Let's assume that we have some measurement of 
+\begin_inset Formula $\phi$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+ In our case, this will come from ROSflight (or pixhawk or inertial sense).
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}\phi\\
+\theta
+\end{bmatrix}=\begin{bmatrix}\hat{\phi}_{\text{ }}\\
+\hat{\theta}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+Also we will assume that we can measure our relative heading to the target
+\begin_inset Formula 
+\begin{equation}
+\psi=\hat{\psi}.
+\end{equation}
+
+\end_inset
+
+We also use measurements from the accelerometer
+\begin_inset Formula 
+\begin{align}
+a_{x} & =-\frac{\mu}{m}u\\
+a_{y} & =-\frac{\mu}{m}v
+\end{align}
+
+\end_inset
+
+and we use 
+\begin_inset Formula $p,q,r,$
+\end_inset
+
+and 
+\begin_inset Formula $a_{z}$
+\end_inset
+
+ to propagate our filter.
+\end_layout
+
+\begin_layout Part
+Lie Algebra
+\end_layout
+
+\begin_layout Section
+Landmark Propagation
+\end_layout
+
+\begin_layout Standard
+From the paper, we note that we propagate the Kalman filter with the boxplus
+ operator
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}\left(t+dt\right)=\hat{\boldsymbol{x}}\left(t\right)\boxplus f\left(\hat{\boldsymbol{x}}\left(t\right),\boldsymbol{u}\left(t\right)\right)dt.
+\end{equation}
+
+\end_inset
+
+Our estimated state will be given by 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\begin{bmatrix}\boldsymbol{q}_{c}^{\zeta_{1}}\rho_{1}\dots\boldsymbol{q}_{c}^{\zeta_{n}}\rho_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+First, let us just worry about propagating the landmark states, assuming
+ that the UAV motion is known.
+ For the landmarks, the only elements of 
+\begin_inset Formula $f$
+\end_inset
+
+ that we care about are
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}}.
+\end{equation}
+
+\end_inset
+
+Our inputs are denoted by 
+\begin_inset Formula $\boldsymbol{u}=\left[\boldsymbol{v}_{c/I}^{c},\boldsymbol{\omega}_{c/I}^{c}\right]$
+\end_inset
+
+, and the input noise is 
+\begin_inset Formula $\boldsymbol{\eta}=\begin{bmatrix}\boldsymbol{\eta}_{v}\boldsymbol{\eta}_{\omega}\end{bmatrix}$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{c/I}^{c}=\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\omega}_{c/I}^{c}=\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}.
+\end{equation}
+
+\end_inset
+
+To propagate the quaternion, we must define the 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ operator for the quaternion unit vector.
+ 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{q}_{c}^{\zeta}\boxplus\boldsymbol{\delta}\triangleq\exp\left(T_{\zeta}\boldsymbol{\delta}\right)\otimes\boldsymbol{q}_{c}^{\zeta}
+\end{equation}
+
+\end_inset
+
+I think this means that 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\delta=\dot{\boldsymbol{q}}}_{c}^{\zeta}dt.
+\end{equation}
+
+\end_inset
+
+Now we need to define a few things
+\begin_inset Formula 
+\begin{equation}
+R\left(\boldsymbol{q}\right)=\left(2q_{0}^{2}-1\right)I-2q_{0}\bar{\boldsymbol{q}}^{\mathcircumflex}+2\bar{\boldsymbol{q}}\bar{\boldsymbol{q}}^{T}\in SO\left(3\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\zeta}_{i/c}^{c}=\left(R_{c}^{\zeta_{i}}\right)^{T}e_{3}\in S^{2}\subset\mathbb{R}^{3}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+T_{\zeta_{i}}=\left(R_{c}^{\zeta_{i}}\right)^{T}\left[e_{1}e_{2}\right]\in\mathbb{R}^{3\times2}
+\end{equation}
+
+\end_inset
+
+and finally
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\triangleq\begin{bmatrix}\cos\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\\
+\sin\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\frac{\boldsymbol{\delta}}{\parallel\boldsymbol{\delta}\parallel}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+or the small angle approximation
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\approx\begin{bmatrix}1\\
+\frac{\boldsymbol{\delta}}{2}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+For inverse depth it is pretty simple since 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ is the same as 
+\begin_inset Formula $+$
+\end_inset
+
+.
+ We have
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+so that
+\begin_inset Formula 
+\begin{equation}
+\rho_{i}\left(t+dt\right)=\rho_{i}+\dot{\rho}_{i}dt
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+EKF State Jacobians 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{x}}=\begin{bmatrix}F_{11} & F_{12} & \dots & 0\\
+F_{21} & F_{22} & \dots & 0\\
+0 & \dots & \ddots & \vdots\\
+0 & 0 & \dots & 0
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+F_{11}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-T_{\zeta_{i}}^{T}\left[\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)^{\mathcircumflex}+\rho_{i}\left(\boldsymbol{v}_{c/I}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right]T_{\zeta_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{12}=\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\rho_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+F_{21}=\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{q}_{c}^{\zeta}}=-\rho_{i}^{2}\left(\boldsymbol{v}_{c/I}^{c}\right)^{T}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+F_{22}=\frac{\partial\dot{\rho_{i}}}{\partial\rho_{i}}=2\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+EKF Input Jacobians
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+G=\frac{\partial\dot{\boldsymbol{x}}}{\partial\boldsymbol{u}}=\begin{bmatrix}G_{11} & G_{12}\\
+G_{21} & G_{22}\\
+\vdots & \vdots
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{11} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =T_{\zeta_{i}}^{T}\left(\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{12} & =\frac{\partial\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(-T_{\zeta_{i}}^{T}\left(\left(\bar{\boldsymbol{\omega}}_{c/I}^{c}-\boldsymbol{\eta}_{\omega}\right)+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)\right)}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =T_{\zeta_{i}}^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{21} & =\frac{\partial\dot{\rho_{i}}}{\partial\boldsymbol{\eta}_{v}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =-\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{22} & =\frac{\partial\dot{\rho}_{i}}{\partial\boldsymbol{\eta}_{\omega}}\\
+ & =\frac{\partial\left(\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\left(\bar{\boldsymbol{v}}_{c/I}^{c}-\boldsymbol{\eta}_{v}\right)\right)}{\partial\boldsymbol{\eta}_{v}}\\
+ & =0
+\end{align}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Pixel Measurement Update
+\end_layout
+
+\begin_layout Standard
+We assume that we know the camera intrinsic values, namely the pixel location
+ of the camera's optical axis 
+\begin_inset Formula $\left(u_{0},v_{0}\right)$
+\end_inset
+
+ and the camera focal lengths 
+\begin_inset Formula $\left(f_{x},f_{y}\right)$
+\end_inset
+
+.
+ Now we assume that we can measure the landmark location in the camera frame.
+ The pinhole camera model can be written as
+\begin_inset Formula 
+\begin{equation}
+h_{\text{cam}}\left(\boldsymbol{x}\right)=\frac{1}{e_{3}^{T}\zeta^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\boldsymbol{\zeta}^{c}+\begin{bmatrix}u_{0}\\
+v_{0}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ The jacobian 
+\begin_inset Formula $\partial h_{\text{cam}}\slash\partial\boldsymbol{x}$
+\end_inset
+
+ of the camera measurement model is given by
+\begin_inset Formula 
+\begin{equation}
+H_{\text{cam}}=\begin{bmatrix}H_{1} & 0 & \dots & H_{n} & 0\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+H_{i}=\frac{1}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}\begin{bmatrix}f_{x} & 0 & 0\\
+0 & f_{y} & 0
+\end{bmatrix}\left(\frac{\boldsymbol{\zeta}_{i/c}^{c}e_{3}^{T}}{e_{3}^{T}\boldsymbol{\zeta}_{i/c}^{c}}-I_{3\times3}\right)\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}T_{\zeta_{i}}.
+\end{equation}
+
+\end_inset
+
+We use these equations to update our state
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}\boxminus h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+which I think is just
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{x}}^{+}=\hat{\boldsymbol{x}}\boxplus K\left(\boldsymbol{z}-h\left(\hat{\boldsymbol{x}}\right)\right)
+\end{equation}
+
+\end_inset
+
+because the pixel measurements are 
+\begin_inset Formula $\in\mathbb{R}^{2}.$
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
