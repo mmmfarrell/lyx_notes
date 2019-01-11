@@ -136,7 +136,7 @@ First, let us just worry about propagating the landmark states, assuming
 
 \begin_inset Formula 
 \begin{equation}
-\dot{\rho_{i}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}}.
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}.
 \end{equation}
 
 \end_inset
@@ -538,9 +538,9 @@ Velocity Propagation
 \end_layout
 
 \begin_layout Standard
-Since we assum constant velocity of the goal frame with respect to the inertial
- frame (expressed in the inertial frame), the velocity states need no propagatio
-n.
+Since we assume constant velocity of the goal frame with respect to the
+ inertial frame (expressed in the inertial frame), the velocity states need
+ no propagation.
 \begin_inset Formula 
 \begin{equation}
 \boldsymbol{\dot{v}}_{g/I}^{I}=\bar{0}
@@ -990,6 +990,312 @@ We update our state with
 
 because the velocity measurements are 
 \begin_inset Formula $\in\mathbb{R}^{3}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Now Using Only IMU And Mono Camera
+\end_layout
+
+\begin_layout Section
+State Vector
+\end_layout
+
+\begin_layout Standard
+We wish to estimate the position, velocity and orientation of a UAV as well
+ as the inertial velocity of a moving target (moving at approximately constant
+ velocity?).
+ We also wish to estiamte the UAV position relative to a point on the moving
+ target.
+ To improve these estimates, we also estimate the locations of many other
+ visible features on the moving target.
+ The estimated state vector is therefore given by:
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{x}=\begin{bmatrix}\boldsymbol{p}_{b/I}^{I} & \boldsymbol{v}_{b/I}^{b} & \boldsymbol{q}_{I}^{b} & \beta_{a} & \beta_{\omega} & b & \boldsymbol{v}_{g/I}^{I} & \boldsymbol{q}_{c}^{\zeta_{0}} & \rho_{0} & \dots & \boldsymbol{q}_{c}^{\zeta_{n}} & \rho_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+Where 
+\begin_inset Formula $b$
+\end_inset
+
+ is the linear drag term.
+ The inputs to the system are denoted by 
+\begin_inset Formula $\boldsymbol{u}=\begin{bmatrix}\boldsymbol{a}_{b/I}^{I} & \boldsymbol{\omega}_{b/I}^{I}\end{bmatrix}$
+\end_inset
+
+ and the input noise, 
+\begin_inset Formula $\boldsymbol{\eta}=\begin{bmatrix}\boldsymbol{\eta}_{a} & \boldsymbol{\eta}_{\omega}\end{bmatrix}$
+\end_inset
+
+.
+ The measured acceleration, 
+\begin_inset Formula $\bar{\boldsymbol{a}}_{b/I}^{b}$
+\end_inset
+
+, and angular rates, 
+\begin_inset Formula $\bar{\boldsymbol{\omega}}_{b/I}^{b}$
+\end_inset
+
+ are shown to correspond by
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{a}_{b/I}^{b} & =\bar{\boldsymbol{a}}_{b/I}^{b}-\beta_{a}-\eta_{a}\\
+\boldsymbol{\omega}_{b/I}^{b} & =\bar{\boldsymbol{\omega}}_{b/I}^{I}-\beta_{\omega}-\eta_{\omega}.
+\end{align*}
+
+\end_inset
+
+ It should be noted that we assume to know the camera position and angular
+ offsets from the body frame, 
+\begin_inset Formula $R_{b}^{c}$
+\end_inset
+
+ and 
+\begin_inset Formula $p_{c/b}^{b}$
+\end_inset
+
+.
+ With these we can show that the camera linear and angular velocities are
+ given by
+\begin_inset Formula 
+\begin{align*}
+\boldsymbol{v}_{c/I}^{c} & =R_{b}^{c}\left(\boldsymbol{v}_{b/I}^{b}+\left(\boldsymbol{\omega}_{b/I}^{b}\right)^{\mathcircumflex}\boldsymbol{p}_{c/b}^{b}\right)\\
+\boldsymbol{\omega}_{c/I}^{c} & =R_{b}^{c}\boldsymbol{\omega}_{b/I}^{b}.
+\end{align*}
+
+\end_inset
+
+We also note that the velocity of the camera with repect to the goal frame,
+ expressed by the camera frame is given by:
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{v}_{c/g}^{c}=\boldsymbol{v}_{c/I}^{c}-R_{b}^{c}R_{I}^{b}\boldsymbol{v}_{g/I}^{I}.
+\end{equation}
+
+\end_inset
+
+Right now we also have to make this awful assumption that the goal frame
+ is not rotating with respect to the inertial frame such that (TODO)
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\omega}_{c/g}^{c}=\boldsymbol{\omega}_{c/I}^{c}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+State Propagation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{x}}=\begin{bmatrix}\boldsymbol{\dot{p}}_{b/I}^{I} & \boldsymbol{\dot{v}}_{b/I}^{b} & \boldsymbol{\dot{q}}_{I}^{b} & \dot{\beta}_{a} & \dot{\beta}_{\omega} & \dot{b} & \boldsymbol{\dot{v}}_{g/I}^{I} & \boldsymbol{\dot{q}}_{c}^{\zeta_{0}} & \dot{\rho}_{0} & \dots & \boldsymbol{\dot{q}}_{c}^{\zeta_{n}} & \dot{\rho}_{n}\end{bmatrix}^{T}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+UAV State Propagation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{p}}_{b/I}^{I}=\left(R_{I}^{b}\right)^{T}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{v}}_{b/I}^{b}=\boldsymbol{e}_{3}\boldsymbol{e}_{3}^{T}\boldsymbol{a}_{b/I}^{b}+R_{I}^{b}\boldsymbol{g}^{I}-b\begin{bmatrix}\boldsymbol{e}_{1} & \boldsymbol{e}_{2} & \boldsymbol{0}\end{bmatrix}\boldsymbol{v}_{b/I}^{b}-\left(\boldsymbol{\omega}_{b/I}^{b}\right)^{\mathcircumflex}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{q}}_{I}^{b}=\boldsymbol{\omega}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{a}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{\omega}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{b}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Goal Velocity Propagation
+\end_layout
+
+\begin_layout Standard
+Since we assume constant velocity of the goal frame with respect to the
+ inertial frame (expressed in the inertial frame), the velocity states need
+ no propagation.
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{v}}_{g/I}^{I}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Landmark Propagation
+\end_layout
+
+\begin_layout Standard
+When the landmarks are static in the inertial frame, the landmark propagation
+ is defined by
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/I}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/I}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/I}^{c}.
+\end{equation}
+
+\end_inset
+
+However, since we assume that the landmarks are only static in the goal
+ frame, we instead write the landmark propagation as
+\begin_inset Formula 
+\begin{equation}
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}}=-T_{\zeta_{i}}^{T}\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\rho_{i}}=\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{T}\boldsymbol{v}_{c/g}^{c}.
+\end{equation}
+
+\end_inset
+
+To propagate these, we must define the 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ operator for the quaternion unit vector
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{q}_{c}^{\zeta}\boxplus\boldsymbol{\delta}\triangleq\exp\left(T_{\zeta}\boldsymbol{\delta}\right)\otimes\boldsymbol{q}_{c}^{\zeta}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\delta=\dot{\boldsymbol{q}}}_{c}^{\zeta}dt.
+\end{equation}
+
+\end_inset
+
+ Now we need to define a few things
+\begin_inset Formula 
+\begin{equation}
+R\left(\boldsymbol{q}\right)=\left(2q_{0}^{2}-1\right)I-2q_{0}\bar{\boldsymbol{q}}^{\mathcircumflex}+2\bar{\boldsymbol{q}}\bar{\boldsymbol{q}}^{T}\in SO\left(3\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\zeta}_{i/c}^{c}=\left(R_{c}^{\zeta_{i}}\right)^{T}e_{3}\in S^{2}\subset\mathbb{R}^{3}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+T_{\zeta_{i}}=\left(R_{c}^{\zeta_{i}}\right)^{T}\left[e_{1}e_{2}\right]\in\mathbb{R}^{3\times2}
+\end{equation}
+
+\end_inset
+
+and finally
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\triangleq\begin{bmatrix}\cos\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\\
+\sin\left(\frac{\parallel\boldsymbol{\delta}\parallel}{2}\right)\frac{\boldsymbol{\delta}}{\parallel\boldsymbol{\delta}\parallel}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+or the small angle approximation
+\begin_inset Formula 
+\begin{equation}
+\exp\left(\boldsymbol{\delta}\right)\approx\begin{bmatrix}1\\
+\frac{\boldsymbol{\delta}}{2}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+ For inverse depth it is pretty simple since 
+\begin_inset Formula $\boxplus$
+\end_inset
+
+ is the same as 
+\begin_inset Formula $+$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\rho_{i}\left(t+dt\right)=\rho_{i}+\dot{\rho}_{i}dt.
+\end{equation}
+
 \end_inset
 
 
