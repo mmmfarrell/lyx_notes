@@ -1,0 +1,382 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass amsart
+\use_default_options true
+\begin_removed_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_removed_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+CS 650R Computer Vision
+\end_layout
+
+\begin_layout Part
+Image Processing 
+\begin_inset Quotes eld
+\end_inset
+
+Low level vision
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Image processing = Image in, image out
+\end_layout
+
+\begin_layout Itemize
+Computer Vision = high level, abstract info from images
+\end_layout
+
+\begin_layout Itemize
+LAB = color model that is visually linear (similar looking colors are euclidean
+ close)
+\end_layout
+
+\begin_layout Itemize
+Fourier Transform = rotate image = rotate forier transform
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Can be used for document processing
+\end_layout
+
+\begin_layout Itemize
+Should have strong vertical and horizontal fourier components
+\end_layout
+
+\begin_layout Itemize
+Find the fourier peaks and rotate so they are vertical and horizontal
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Convolution speeds ~ About 7x7
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+anything bigger, do it in frequency domain
+\end_layout
+
+\begin_layout Itemize
+anything small, do in spatial domain
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Template Matching: Hough Transform, Voting System
+\end_layout
+
+\begin_layout Standard
+Hough Transform
+\end_layout
+
+\begin_layout Itemize
+Key Idea: find edge points and let them vote for where to shape might be
+\end_layout
+
+\begin_layout Itemize
+Limitation: must know the target shape ahead of time (circles, lines, etc.)
+\end_layout
+
+\begin_layout Itemize
+Advantages:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+for large things, it can be much more efficient than template matching
+\end_layout
+
+\begin_layout Itemize
+robust to noise, dropout, etc.
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Vision as optimization, bayesian approaches
+\end_layout
+
+\begin_layout Itemize
+Common approach is to format your problem as an optimization problem that
+ is well defined (and we know how to solve)
+\end_layout
+
+\begin_layout Itemize
+Careful of optimization method
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+May require convex, etc.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Maybe you only need approximately optimal (could be much faster to solve
+ for)
+\end_layout
+
+\begin_layout Itemize
+Results only as good as
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+your objective function
+\end_layout
+
+\begin_layout Itemize
+your optimization algorithm
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Adam optimizer = Momentum gradient descent with adapting
+\end_layout
+
+\begin_layout Itemize
+Simulated annealing
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+tries to overcome two problems of gradient-descent
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+having to differentiate the criterion function
+\end_layout
+
+\begin_layout Itemize
+getting stuck in local minima
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Basic approach
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+randomly generate a small change - if better, keep it
+\end_layout
+
+\begin_layout Itemize
+with some random probability, allow a change in a worse direction in order
+ to explore more fully the solution space
+\end_layout
+
+\begin_layout Itemize
+Slowly decrease the random probability
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Genetic Algorithms
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Encode possible solutions as 
+\begin_inset Quotes eld
+\end_inset
+
+strings
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Start with a set of initial potential solutions
+\end_layout
+
+\begin_layout Itemize
+For each iteration (
+\begin_inset Quotes eld
+\end_inset
+
+generation
+\begin_inset Quotes erd
+\end_inset
+
+), three possible oppertaions:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series bold
+reproduction
+\series default
+: test each string to see how good it is
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+If good, keep it and produce more
+\end_layout
+
+\begin_layout Itemize
+if bad, delete it
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series bold
+mutation
+\series default
+: with some probability, randomly change part of the string
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+crossover
+\series default
+: with some probability, splice two existing strings together
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Similar to simulated annealing but occasionally merging promising solutions
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Graduated Nonconvexity
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Finding the minimum of a convex function is easy – gradient descent works
+ just find since theres only one minimum
+\end_layout
+
+\begin_layout Itemize
+Idea: smooth the function until only one minimum
+\end_layout
+
+\begin_layout Itemize
+Problem: not the same function anymore
+\end_layout
+
+\begin_layout Itemize
+But the solution makes a good starting point for a slightly less smooth
+ version of the function
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+E-M Methods
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Expectation maximation methods
+\end_layout
+
+\begin_layout Itemize
+Idea: optimizing subsets of variables might be easier
+\end_layout
+
+\begin_layout Itemize
+Hold fixed all subsets but one
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Pattern Recognition/Machine Learning
+\end_layout
+
+\begin_layout Itemize
+
+\end_layout
+
+\end_body
+\end_document

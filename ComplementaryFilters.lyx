@@ -1,0 +1,318 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Designing Complemetary Filters
+\end_layout
+
+\begin_layout Part
+Steps
+\end_layout
+
+\begin_layout Enumerate
+Find Left-invariant kinematics
+\end_layout
+
+\begin_layout Enumerate
+Find right-invariant error function
+\end_layout
+
+\begin_layout Enumerate
+Find a cost function (lyapunov) & take gradient
+\end_layout
+
+\begin_layout Enumerate
+Create observer
+\end_layout
+
+\begin_layout Section
+Find Left invariant kinematics
+\end_layout
+
+\begin_layout Standard
+Given 
+\begin_inset Formula $X,Y\in G,u\in g$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{X}=Xu
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt}\left(YX\right)=YXu
+\end{equation}
+
+\end_inset
+
+hence it is left invariant.
+\end_layout
+
+\begin_layout Standard
+Example: SO(3)
+\begin_inset Formula 
+\begin{equation}
+SO(3)=\left\{ R\in R^{3x3}|R^{T}R=I,detR=1\right\} 
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+so(3)=\left\{ R\right\} 
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{R}=R\left[\omega\right]_{\times}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Find right invariant error function
+\end_layout
+
+\begin_layout Standard
+Error function
+\begin_inset Formula 
+\begin{equation}
+E(x,\hat{x})=\tilde{x}
+\end{equation}
+
+\end_inset
+
+Given the kinematics
+\begin_inset Formula 
+\begin{equation}
+\dot{\hat{x}}=\hat{x}u
+\end{equation}
+
+\end_inset
+
+Examples of this can be
+\begin_inset Formula 
+\begin{align}
+\tilde{x} & =x\hat{x}^{-1}\\
+ & =\hat{x}x^{-1}\\
+ & =\hat{x}^{-1}x\\
+ & =x^{-1}\hat{x}
+\end{align}
+
+\end_inset
+
+Solution to kinematics
+\begin_inset Formula 
+\begin{equation}
+\hat{x}(t)=\hat{x}_{0}exp_{g}\left(tu\right)
+\end{equation}
+
+\end_inset
+
+So if we choose this
+\begin_inset Formula 
+\begin{align}
+\tilde{x} & =\hat{x}^{-1}x\\
+ & =exp_{g}\left(tu\right)^{-1}\hat{x}_{0}\hat{x}_{0}exp_{g}\left(tu\right)
+\end{align}
+
+\end_inset
+
+kinda.
+ So we want to choose
+\begin_inset Formula 
+\begin{align}
+\tilde{x} & =\hat{x}x^{-1}\\
+ & =\hat{x}_{0}exp_{g}\left(tu\right)\left(x_{0}exp\left(tu\right)\right)^{-1}
+\end{align}
+
+\end_inset
+
+Which is right invariant because
+\begin_inset Formula 
+\begin{align}
+E(xy,\hat{x}y) & =\hat{x}y\left(xy\right)^{-1}\\
+ & =\hat{x}x^{-1}
+\end{align}
+
+\end_inset
+
+Examples
+\begin_inset Formula 
+\begin{equation}
+\hat{R}R^{T}=\tilde{R}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Find a cost function (lyapunov) & take gradient
+\end_layout
+
+\begin_layout Standard
+y are measurements, w are u (inputs).
+ Assume that you are measuring your state.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\dot{\hat{x}} & =f\left(\hat{x},y,w\right)\\
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\dot{\hat{x}} & =\hat{x}u+\alpha\left(\hat{x},y\right)\\
+ & =internalmodel+innovationterm\\
+ & where\alpha(x,x)=0
+\end{align}
+
+\end_inset
+
+How to choose 
+\begin_inset Formula $\alpha$
+\end_inset
+
+.
+ Choose a cost function 
+\begin_inset Formula $f\left(y,\hat{x}\right)$
+\end_inset
+
+, that the minima occurs when 
+\begin_inset Formula $\hat{x}=y$
+\end_inset
+
+.
+ i.e.
+ your estimate is what you are measuring.
+ i.e.
+ estimate is true state.
+\begin_inset Formula 
+\begin{equation}
+\alpha=\frac{\partial}{\partial}f\left(y,\hat{x}\right)
+\end{equation}
+
+\end_inset
+
+Lyapunov function
+\begin_inset Formula 
+\begin{equation}
+V\left(\tilde{x}\right)=f\left(e,\tilde{x}\right)
+\end{equation}
+
+\end_inset
+
+Want cost function to also be right invariant.
+ If this is the case,
+\begin_inset Formula 
+\begin{equation}
+\frac{d}{dt}\tilde{x}=-\frac{\partial}{\partial\hat{x}}f
+\end{equation}
+
+\end_inset
+
+So for SO(3)
+\begin_inset Formula 
+\begin{equation}
+f(y,\hat{R})=\frac{k}{2}\parallel\hat{R}-Y\parallel_{F}^{2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
