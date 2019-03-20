@@ -375,6 +375,279 @@ Pattern Recognition/Machine Learning
 \end_layout
 
 \begin_layout Itemize
+Naive Bayes
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Assumes features are independent of each other
+\end_layout
+
+\begin_layout Itemize
+Essentially a minimum distance classifier in a normalized frame for each
+ class
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Parametric vs.
+ Non Parametric Statistics
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Parametric
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Assumes known distribution
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Non Parametric
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Classify based on the data directly
+\end_layout
+
+\begin_layout Itemize
+Works with any distribution
+\end_layout
+
+\begin_layout Itemize
+Store all data, so slower classification
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Non parametric
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+work directly from the data instead of boiling the training data down to
+ a set of parameters
+\end_layout
+
+\begin_layout Enumerate
+The data is a set of samples from some distribution
+\end_layout
+
+\begin_layout Enumerate
+Samples are sparse but hopefully denser when the p.d.f.
+ is higher
+\end_layout
+
+\begin_layout Enumerate
+Smooth the sampled distribution
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Feature Points, Local invariant descriptors
+\end_layout
+
+\begin_layout Itemize
+Typical process
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Detection: identify points of interest
+\end_layout
+
+\begin_layout Itemize
+Description: extract feature vectors
+\end_layout
+
+\begin_layout Itemize
+Matching: determine correspondence
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+What makes a good feature point?
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Easy to detect.
+ Lightweight
+\end_layout
+
+\begin_layout Itemize
+Repeatable: find some of the same points in multiple images independently
+\end_layout
+
+\begin_layout Itemize
+Distinctive: reliable matching of descriptors
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Tracking
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+when tracking points across multiple images/video
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Invariance
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+features stays the same under different transformations
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+translation, rotation, scale, perspective, illumination
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Aperature problem
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+when looking at a very small neighborhood around a pixel, some motions will
+ not be picked up
+\end_layout
+
+\begin_layout Itemize
+i.e.
+ a point along an edge (not corner) and motion along that edge
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Corner Detectors
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Harris is most common
+\end_layout
+
+\begin_layout Itemize
+Non-maximal suppression
+\end_layout
+
+\begin_layout Itemize
+Invariant = translation, rotation, perspective (mostly), illumination (mostly)
+\end_layout
+
+\begin_layout Itemize
+Not scale invariant
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Scale Space
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+image acquisition averages each pixel's information over some are
+\end_layout
+
+\begin_layout Itemize
+size of that area depends on imaging parameters
+\end_layout
+
+\begin_layout Itemize
+Projected size of object/features depends on its size, distance, etc.
+\end_layout
+
+\begin_layout Itemize
+How do you handle these differences?
+\end_layout
+
+\begin_layout Itemize
+Whats the right 
+\begin_inset Quotes eld
+\end_inset
+
+scale
+\begin_inset Quotes erd
+\end_inset
+
+ to measure?
+\end_layout
+
+\begin_layout Itemize
+There isn't one! Look at them all!
+\end_layout
+
+\begin_layout Itemize
+Think of a space of images at all the scales
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+start with original image
+\end_layout
+
+\begin_layout Itemize
+blur by successive amounts of gaussian blur
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Same idea as pyrimidal algorithms...
+ kinda
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+SIFT (Scale-Invariant Feature Transform)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+use histograms to bin pixels within sub-patches according to their orientation
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Object Detection
+\end_layout
+
+\begin_layout Itemize
+Window-Based Models
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Easy to implement
+\end_layout
+
+\begin_layout Itemize
+high computational complexity
+\end_layout
+
+\begin_layout Itemize
+lost context (i.e.
+ a car should be on a street)
+\end_layout
+
+\end_deeper
+\begin_layout Part
+Geometric Transformations
+\end_layout
+
+\begin_layout Itemize
 
 \end_layout
 

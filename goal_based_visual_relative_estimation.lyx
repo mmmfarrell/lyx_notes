@@ -2876,7 +2876,7 @@ b
 
 \begin_inset Formula 
 \begin{equation}
-{\bf x}_{\text{vehicle}}=\begin{bmatrix}\boldsymbol{v}_{g/I}^{I}\\
+{\bf x}_{\text{vehicle}}=\begin{bmatrix}\boldsymbol{v}_{g/I}^{g}\\
 \boldsymbol{q}_{I}^{g}\\
 {\bf \omega}_{g/I}^{g}
 \end{bmatrix}\in\mathbb{R}^{10\times1}
@@ -3062,7 +3062,64 @@ These dynamics are also from James and Jerel's paper.
 
 \end_inset
 
+We do this by first taking the position of the landmark 
+\begin_inset Formula $i$
+\end_inset
 
+ in the inertial frame as
+\begin_inset Formula 
+\begin{equation}
+{\bf p}_{i/I}^{I}={\bf p}_{g/I}^{I}+\left(R_{I}^{g}\right)^{\top}{\bf p}_{i/g}^{g}
+\end{equation}
+
+\end_inset
+
+Taking the time derivative we get
+\begin_inset Formula 
+\begin{align}
+\frac{d}{dt}{\bf p}_{i/I}^{I} & =\frac{d}{dt}{\bf p}_{g/I}^{I}+\frac{d}{dt}\left(\left(R_{I}^{g}\right)^{\top}{\bf p}_{i/g}^{g}\right)\\
+{\bf v}_{i/I}^{I} & ={\bf v}_{g/I}^{I}+\frac{d\left(R_{I}^{g}\right)^{\top}}{dt}{\bf p}_{i/g}^{g}+\left(R_{I}^{g}\right)^{\top}\frac{d{\bf p}_{i/g}^{g}}{dt}
+\end{align}
+
+\end_inset
+
+Since we assume that the landmark 
+\begin_inset Formula $i$
+\end_inset
+
+ is fixed with respect to the goal frame, we can simplify to
+\begin_inset Formula 
+\begin{align}
+{\bf v}_{i/I}^{I} & ={\bf v}_{g/I}^{I}+\frac{d\left(R_{I}^{g}\right)^{\top}}{dt}{\bf p}_{i/g}^{g}\\
+{\bf v}_{i/I}^{I} & ={\bf v}_{g/I}^{I}+\left(R_{I}^{g}\right)^{\top}\left({\bf \omega}_{g/I}^{g}\right)^{\wedge}{\bf p}_{i/g}^{g}
+\end{align}
+
+\end_inset
+
+Since we want all of this in the camera frame we get
+\begin_inset Formula 
+\begin{align}
+R_{b}^{c}R_{I}^{b}{\bf v}_{i/I}^{I} & =R_{b}^{c}R_{I}^{b}{\bf v}_{g/I}^{I}+R_{b}^{c}R_{I}^{b}\left(R_{I}^{g}\right)^{\top}\left({\bf \omega}_{g/I}^{g}\right)^{\wedge}{\bf p}_{i/g}^{g}\\
+{\bf v}_{i/I}^{c} & =R_{b}^{c}R_{I}^{b}\left(\left(R_{I}^{g}\right)^{\top}{\bf v}_{g/I}^{g}\right)+R_{b}^{c}R_{I}^{b}\left(R_{I}^{g}\right)^{\top}\left({\bf \omega}_{g/I}^{g}\right)^{\wedge}{\bf p}_{i/g}^{g}
+\end{align}
+
+\end_inset
+
+However we still aren't fully there since we need to respresent 
+\begin_inset Formula ${\bf p}_{i/g}$
+\end_inset
+
+ in the camera frame.
+ This is done 
+\begin_inset Formula 
+\begin{equation}
+{\bf v}_{i/I}^{c}=R_{b}^{c}R_{I}^{b}\left(\left(R_{I}^{g}\right)^{\top}{\bf v}_{g/I}^{g}\right)+R_{b}^{c}R_{I}^{b}\left(R_{I}^{g}\right)^{\top}\left({\bf \omega}_{g/I}^{g}\right)^{\wedge}\left(R_{I}^{g}R_{b}^{I}R_{c}^{b}{\bf p}_{i/g}^{c}\right)
+\end{equation}
+
+\end_inset
+
+Which can probably be simplified......
+ TODO
 \begin_inset Formula 
 \begin{align}
 \boldsymbol{p}_{i/c}^{c} & =\frac{1}{\rho_{i}}\boldsymbol{\zeta}_{i/c}^{c}\\
@@ -3086,7 +3143,7 @@ TODO I can probably simplify this a lot.
 \begin_inset Formula 
 \begin{align}
 \boldsymbol{v}_{i/I}^{c} & =R_{b}^{c}R_{I}^{b}R_{g}^{I}\left(\boldsymbol{v}_{g/I}^{g}+\left(\boldsymbol{\omega}_{g/I}^{g}\right)^{\mathcircumflex}R_{I}^{g}R_{b}^{I}R_{c}^{b}\left(\frac{1}{\rho_{i}}\boldsymbol{\zeta}_{i/c}^{c}-\frac{1}{\rho_{g}}\boldsymbol{\zeta}_{g/c}^{c}\right)\right)\\
- & =\left(R_{b}^{c}R_{I}^{b}R_{g}^{I}\boldsymbol{v}_{g/I}^{g}-\left(\frac{1}{\rho_{i}}\boldsymbol{\zeta}_{i/c}^{c}-\frac{1}{\rho_{g}}\boldsymbol{\zeta}_{g/c}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{\omega}_{g/I}^{g}\right)\right)
+ & =\left(R_{b}^{c}R_{I}^{b}R_{g}^{I}\boldsymbol{v}_{g/I}^{g}-\left(\frac{1}{\rho_{i}}\boldsymbol{\zeta}_{i/c}^{c}-\frac{1}{\rho_{g}}\boldsymbol{\zeta}_{g/c}^{c}\right)^{\mathcircumflex}\left(\boldsymbol{\omega}_{g/I}^{g}\right)\right)??????
 \end{align}
 
 \end_inset
@@ -3106,7 +3163,7 @@ TODO I can probably simplify this a lot.
 \begin{align}
 \boldsymbol{\omega}_{c/I}^{c} & =R_{b}^{c}\boldsymbol{\omega}_{b/I}^{b}\\
 \boldsymbol{\omega}_{g/I}^{c} & =R_{b}^{c}R_{I}^{b}R_{g}^{I}\boldsymbol{\omega}_{g/I}^{g}\\
-\boldsymbol{\omega}_{i/I}^{c} & =\boldsymbol{\omega}_{g/I}^{c}
+\boldsymbol{\omega}_{i/I}^{c} & =R_{b}^{c}R_{I}^{b}R_{g}^{I}\boldsymbol{\omega}_{g/I}^{g}
 \end{align}
 
 \end_inset
@@ -3124,7 +3181,7 @@ Using these formulas, we can write
 \begin{align}
 \dot{\boldsymbol{q}}_{c}^{\zeta_{g}} & =-T_{\zeta_{g}}^{T}\left(\boldsymbol{\omega}_{c/g}^{c}+\rho_{g}\left(\boldsymbol{\zeta}_{g/c}^{c}\right)^{\mathcircumflex}\boldsymbol{v}_{c/g}^{c}\right)\\
 \dot{\rho_{g}} & =\rho_{g}^{2}\left(\boldsymbol{\zeta}_{g/c}^{c}\right)^{T}\boldsymbol{v}_{c/g}^{c}\\
-\dot{\boldsymbol{q}}_{c}^{\zeta_{i}} & =-T_{\zeta_{i}}^{\top}\left(\boldsymbol{\omega}_{c/i}^{c}+\rho_{g}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\wedge}\boldsymbol{v}_{c/i}^{c}\right)\\
+\dot{\boldsymbol{q}}_{c}^{\zeta_{i}} & =-T_{\zeta_{i}}^{\top}\left(\boldsymbol{\omega}_{c/i}^{c}+\rho_{i}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\wedge}\boldsymbol{v}_{c/i}^{c}\right)\\
 \dot{\rho}_{i} & =\rho_{i}^{2}\left(\boldsymbol{\zeta}_{i/c}^{c}\right)^{\top}\boldsymbol{v}_{c/i}^{c}
 \end{align}
 
@@ -3238,9 +3295,1105 @@ Plugging it all in
  & =\left(\hat{\rho}_{i}^{2}+2\hat{\rho}_{i}\tilde{\rho}_{i}+\tilde{\rho}_{i}^{2}\right)\left(\left(I+\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{i/c}^{c}\right)^{T}\left(R_{b}^{c}\left(\left(\hat{\boldsymbol{v}}_{b/I}^{b}+\tilde{\boldsymbol{v}}_{b/I}^{b}\right)+\left(\boldsymbol{\bar{\omega}}_{b/I}^{b}-{\bf \hat{\beta}}_{\omega}-{\bf \tilde{\beta}}_{\omega}-{\bf \eta}_{\omega}\right)^{\mathcircumflex}\boldsymbol{p}_{c/b}^{b}\right)-\left(R_{b}^{c}\left(\hat{R}_{I}^{b}\tilde{R}_{I}^{b}\right)\left(\hat{R}_{g}^{I}\tilde{R}_{g}^{I}\right)\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\frac{1}{\left(\hat{\rho}_{i}+\tilde{\rho}_{i}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{i/c}^{c}\right)-\frac{1}{\left(\hat{\rho}_{g}+\tilde{\rho}_{g}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{g}}\tilde{{\bf q}}_{c}^{\zeta_{g}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{g/c}^{c}\right)\right)^{\mathcircumflex}\left(\hat{\boldsymbol{\omega}}_{g/I}^{g}+\tilde{\boldsymbol{\omega}}_{g/I}^{g}\right)\right)\right)-\hat{\rho}_{i}^{2}\left(\hat{\boldsymbol{\zeta}}_{i/c}^{c}\right)^{T}\hat{\boldsymbol{v}}_{c/i}^{c}\\
  & =\left(\hat{\rho}_{i}^{2}+2\hat{\rho}_{i}\tilde{\rho}_{i}+\tilde{\rho}_{i}^{2}\right)\left({\bf \hat{\zeta}}_{i/c}^{c}\right)^{\top}\left(I-\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right)\left(R_{b}^{c}\left(\left(\hat{\boldsymbol{v}}_{b/I}^{b}+\tilde{\boldsymbol{v}}_{b/I}^{b}\right)+\left(\boldsymbol{\bar{\omega}}_{b/I}^{b}-{\bf \hat{\beta}}_{\omega}-{\bf \tilde{\beta}}_{\omega}-{\bf \eta}_{\omega}\right)^{\mathcircumflex}\boldsymbol{p}_{c/b}^{b}\right)-\left(R_{b}^{c}\left(\hat{R}_{I}^{b}\tilde{R}_{I}^{b}\right)\left(\hat{R}_{g}^{I}\tilde{R}_{g}^{I}\right)\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\frac{1}{\left(\hat{\rho}_{i}+\tilde{\rho}_{i}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{i/c}^{c}\right)-\frac{1}{\left(\hat{\rho}_{g}+\tilde{\rho}_{g}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{g}}\tilde{{\bf q}}_{c}^{\zeta_{g}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{g/c}^{c}\right)\right)^{\mathcircumflex}\left(\hat{\boldsymbol{\omega}}_{g/I}^{g}+\tilde{\boldsymbol{\omega}}_{g/I}^{g}\right)\right)\right)-\hat{\rho}_{i}^{2}\left(\hat{\boldsymbol{\zeta}}_{i/c}^{c}\right)^{T}\hat{\boldsymbol{v}}_{c/i}^{c}\\
  & =\left(\hat{\rho}_{i}^{2}+2\hat{\rho}_{i}\tilde{\rho}_{i}\right)\left({\bf \hat{\zeta}}_{i/c}^{c}\right)^{\top}\left(I-\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right)\left(R_{b}^{c}\left(\left(\hat{\boldsymbol{v}}_{b/I}^{b}+\tilde{\boldsymbol{v}}_{b/I}^{b}\right)+\left(\boldsymbol{\bar{\omega}}_{b/I}^{b}-{\bf \hat{\beta}}_{\omega}-{\bf \tilde{\beta}}_{\omega}-{\bf \eta}_{\omega}\right)^{\mathcircumflex}\boldsymbol{p}_{c/b}^{b}\right)-\left(R_{b}^{c}\left(\hat{R}_{I}^{b}\tilde{R}_{I}^{b}\right)\left(\hat{R}_{g}^{I}\tilde{R}_{g}^{I}\right)\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\frac{1}{\left(\hat{\rho}_{i}+\tilde{\rho}_{i}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{i}}\tilde{{\bf q}}_{c}^{\zeta_{i}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{i/c}^{c}\right)-\frac{1}{\left(\hat{\rho}_{g}+\tilde{\rho}_{g}\right)}\left(\left(I+\left(\hat{T}_{\zeta_{g}}\tilde{{\bf q}}_{c}^{\zeta_{g}}\right)^{\wedge}\right){\bf \hat{\zeta}}_{g/c}^{c}\right)\right)^{\mathcircumflex}\left(\hat{\boldsymbol{\omega}}_{g/I}^{g}+\tilde{\boldsymbol{\omega}}_{g/I}^{g}\right)\right)\right)-\hat{\rho}_{i}^{2}\left(\hat{\boldsymbol{\zeta}}_{i/c}^{c}\right)^{T}\hat{\boldsymbol{v}}_{c/i}^{c}\\
-\\
+ & blah\\
+ & blah
 \end{align}
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Measurement Models
+\end_layout
+
+\begin_layout Subsection
+Goal Orientation
+\end_layout
+
+\begin_layout Standard
+The only new measurement model that we need is a measurement of the goal
+ orientation.
+ We get this from the ArUco measurements where we get a measurement of the
+ rotation from the camera frame to the goal (ArUco) frame.
+\begin_inset Formula 
+\begin{equation}
+h\left({\bf x}\right)={\bf q}_{c}^{g}
+\end{equation}
+
+\end_inset
+
+However, we need to express this in terms of the states of our estimator.
+ Something like this
+\begin_inset Formula 
+\begin{align}
+h\left({\bf x}\right) & ={\bf q}_{c}^{g}\\
+ & ={\bf q}\left(R_{I}^{g}R_{b}^{I}R_{c}^{b}\right)\\
+ & ={\bf q}_{c}^{b}\otimes{\bf q}_{b}^{I}\otimes{\bf q}_{I}^{g}\\
+ & ={\bf q}_{c}^{b}\otimes\left({\bf q}_{I}^{b}\right)^{*}\otimes{\bf q}_{I}^{g}
+\end{align}
+
+\end_inset
+
+Using the error state formulation from 
+\begin_inset Quotes eld
+\end_inset
+
+Relative Multiplicative EKF
+\begin_inset Quotes erd
+\end_inset
+
+ Koch, et.
+ al.
+ We can follow section 6.2.4.
+\begin_inset Formula 
+\begin{align}
+{\bf h}({\bf x}) & ={\bf q}_{c}^{g}\\
+ & ={\bf q}_{c}^{b}\otimes\left({\bf q}_{I}^{b}\right)^{*}\otimes{\bf q}_{I}^{g}\otimes{\bf \eta}^{\wedge}
+\end{align}
+
+\end_inset
+
+We can expand this so that 
+\begin_inset Formula 
+\begin{align}
+{\bf h}({\bf x}) & ={\bf q}_{c}^{b}\otimes\left(\hat{{\bf q}}_{I}^{b}\otimes\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf \eta}^{\wedge}\\
+ & ={\bf q}_{c}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf \eta}^{\wedge}
+\end{align}
+
+\end_inset
+
+The estimated measurement model is given by 
+\begin_inset Formula 
+\begin{equation}
+{\bf h}(\hat{{\bf x}})={\bf q}_{c}^{b}\otimes\left({\bf \hat{q}}_{I}^{b}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{g}
+\end{equation}
+
+\end_inset
+
+For a given measurement, 
+\begin_inset Formula ${\bf z}$
+\end_inset
+
+, the residual is modeled as 
+\begin_inset Formula 
+\begin{align}
+{\bf r} & =\left({\bf h}\left(\hat{{\bf x}}\right)^{-1}\otimes{\bf z}\right)^{\vee}\\
+ & =\left({\bf h}\left(\hat{{\bf x}}\right)^{-1}\otimes{\bf h}({\bf x})\right)^{\vee}\\
+ & =\left(\left({\bf q}_{c}^{b}\otimes\left({\bf \hat{q}}_{I}^{b}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{g}\right)^{-1}\otimes\left({\bf q}_{c}^{b}\otimes\left({\bf q}_{I}^{b}\right)^{*}\otimes{\bf q}_{I}^{g}\otimes{\bf \eta}^{\wedge}\right)\right)^{\vee}\\
+ & =\left(\left({\bf \hat{q}}_{I}^{g}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{b}\otimes\left({\bf q}_{c}^{b}\right)^{-1}\otimes{\bf q}_{c}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf \eta}^{\wedge}\right)^{\vee}\\
+ & =\left(\left({\bf \hat{q}}_{I}^{g}\right)^{-1}\otimes\left({\bf \hat{q}}_{I}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\right)\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\right)^{\vee}+{\bf \eta}\\
+ & =\left(-R_{I}^{g}\left(R_{I}^{b}\right)^{\top}\delta{\bf \theta}_{I}^{b}+\delta{\bf \theta}_{I}^{g}\right)+{\bf \eta}
+\end{align}
+
+\end_inset
+
+So the measurement jacobians are simply given by 
+\begin_inset Formula 
+\begin{align}
+\frac{\partial{\bf r}}{\partial\delta\theta_{I}^{b}} & =-R_{I}^{g}\left(R_{I}^{b}\right)^{\top}\\
+\frac{\partial{\bf r}}{\partial\delta\theta_{I}^{g}} & =I
+\end{align}
+
+\end_inset
+
+Now let us assume that the goal frame and the aruco frame are not the same.
+ I.e.
+ the aruco frame is NWU (or some simialr reference) and the goal frame is
+ NED like all of the other frames.
+ We can assume to know the rotation 
+\begin_inset Formula $q_{g}^{\text{aruco}}$
+\end_inset
+
+ and we still want to estimate the rotation 
+\begin_inset Formula $q_{I}^{g}$
+\end_inset
+
+.
+ This means that
+\begin_inset Formula 
+\begin{equation}
+{\bf q}_{I}^{\text{aruco}}={\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+{\bf h}({\bf x}) & ={\bf q}_{c}^{\text{aruco}}\\
+ & ={\bf q}_{c}^{b}\otimes\left({\bf q}_{I}^{b}\right)^{*}\otimes{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\otimes{\bf \eta}^{\wedge}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+{\bf h}({\bf x}) & ={\bf q}_{c}^{b}\otimes\left(\hat{{\bf q}}_{I}^{b}\otimes\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\otimes{\bf \eta}^{\wedge}\\
+ & ={\bf q}_{c}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\otimes{\bf \eta}^{\wedge}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+{\bf h}(\hat{{\bf x}})={\bf q}_{c}^{b}\otimes\left({\bf \hat{q}}_{I}^{b}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}
+\end{equation}
+
+\end_inset
+
+And so the residual is given by
+\begin_inset Formula 
+\begin{align}
+{\bf r} & =\left({\bf h}\left(\hat{{\bf x}}\right)^{-1}\otimes{\bf z}\right)^{\vee}\\
+ & =\left({\bf h}\left(\hat{{\bf x}}\right)^{-1}\otimes{\bf h}({\bf x})\right)^{\vee}\\
+ & =\left(\left({\bf q}_{c}^{b}\otimes\left({\bf \hat{q}}_{I}^{b}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\right)^{-1}\otimes\left({\bf q}_{c}^{b}\otimes\left({\bf q}_{I}^{b}\right)^{*}\otimes{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\otimes{\bf \eta}^{\wedge}\right)\right)^{\vee}\\
+ & =\left(\left({\bf q}_{g}^{\text{aruco}}\right)^{-1}\otimes\left({\bf \hat{q}}_{I}^{g}\right)^{-1}\otimes{\bf \hat{q}}_{I}^{b}\otimes\left({\bf q}_{c}^{b}\right)^{-1}\otimes{\bf q}_{c}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\otimes{\bf \eta}^{\wedge}\right)^{\vee}\\
+ & =\left(\left({\bf q}_{g}^{\text{aruco}}\right)^{-1}\otimes\left({\bf \hat{q}}_{I}^{g}\right)^{-1}\otimes\left({\bf \hat{q}}_{I}^{b}\otimes\left(\delta{\bf q}_{I}^{b}\right)^{-1}\otimes\left(\hat{{\bf q}}_{I}^{b}\right)^{-1}\right)\otimes\hat{{\bf q}}_{I}^{g}\otimes\delta{\bf q}_{I}^{g}\otimes{\bf q}_{g}^{\text{aruco}}\right)^{\vee}+{\bf \eta}\\
+ & =R_{g}^{\text{aruco}}\left(-R_{I}^{g}\left(R_{I}^{b}\right)^{\top}\delta{\bf \theta}_{I}^{b}+\delta{\bf \theta}_{I}^{g}\right)+{\bf \eta}
+\end{align}
+
+\end_inset
+
+So the measurement jacobians are simply given by 
+\begin_inset Formula 
+\begin{align}
+\frac{\partial{\bf r}}{\partial\delta\theta_{I}^{b}} & =-R_{g}^{\text{aruco}}R_{I}^{g}\left(R_{I}^{b}\right)^{\top}\\
+\frac{\partial{\bf r}}{\partial\delta\theta_{I}^{g}} & =R_{g}^{\text{aruco}}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+ArUco T Vec
+\end_layout
+
+\begin_layout Standard
+From the ArUco detection, it gives us an Rvec and Tvec where the t vec is
+ the position vector from the camera frame to the ArUco frame expressed
+ in the camera frame.
+ We can express this measurement model as
+\begin_inset Formula 
+\begin{align}
+h({\bf x}) & ={\bf p}_{\text{aruco}/\text{camera}}^{\text{camera}}.
+\end{align}
+
+\end_inset
+
+Since we have defined the goal frame and the aruco frame to be co-located,
+ we can expresss this in terms of our state vectors as
+\begin_inset Formula 
+\begin{align}
+h({\bf x}) & ={\bf p}_{\text{aruco}/I}^{c}-{\bf p}_{c/I}^{c}\\
+ & ={\bf p}_{g/I}^{c}-{\bf p}_{c/I}^{c}\\
+ & =R_{b}^{c}R_{I}^{b}{\bf p}_{g/I}^{I}-R_{b}^{c}\left({\bf p}_{c/b}^{b}+R_{I}^{b}{\bf p}_{b/I}^{I}\right)
+\end{align}
+
+\end_inset
+
+The jacobian of this is kinda complicated but here are the parts
+\begin_inset Formula 
+\begin{align}
+\frac{\partial h}{\partial{\bf p}_{b/I}^{I}} & =-R_{b}^{c}R_{I}^{b}\\
+\frac{\partial h}{\partial\tilde{q}_{I}^{b}} & =-R_{b}^{c}R_{I}^{b}\left({\bf p}_{g/I}^{I}\right)^{\vee}+R_{b}^{c}R_{I}^{b}\left({\bf p}_{b/I}^{I}\right)^{\vee}\\
+\frac{\partial h}{\partial\tilde{q}_{I}^{b}} & =R_{b}^{c}R_{I}^{b}\left({\bf p}_{g/I}^{I}\right)^{\vee}-R_{b}^{c}R_{I}^{b}\left({\bf p}_{b/I}^{I}\right)^{\vee}\text{This is the one that works in the code, note exactly sure why (-1)}\\
+\frac{\partial h}{\partial{\bf p}_{g/I}^{I}} & =R_{b}^{c}R_{I}^{b}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Sensors on the Boat (and No visual features)
+\end_layout
+
+\begin_layout Standard
+A different approach to the relative estimation problem is to allow sensors
+ on the moving target to communicate with the UAV.
+ We still assume that there is a fiducial landing marker as the landing
+ target that we can detect from the UAV's camera.
+ We can then estimate the UAV state and the landing vehicle's state separately.
+ This approach is taken in several other papers, however, by estimating
+ them together (tightly coupled) we can get better results.
+\end_layout
+
+\begin_layout Section
+Estimated State
+\end_layout
+
+\begin_layout Standard
+We will split the state into 2 components, the uav states, 
+\begin_inset Formula ${\bf x}_{uav}$
+\end_inset
+
+, the vehicle states, 
+\begin_inset Formula ${\bf x}_{vehicle}$
+\end_inset
+
+.
+ The total state is then given by the tuple
+\begin_inset Formula 
+\begin{align}
+{\bf x} & =\left\langle {\bf x}_{\text{uav}}^{\top},{\bf x}_{\text{vehicle}}^{\top}\right\rangle ^{\top}\\
+{\bf u} & =\begin{bmatrix}\left(\bar{{\bf a}}_{b/I}^{b}-{\bf \eta}_{a}\right)^{\top} & \left(\bar{{\bf \omega}}_{b/I}^{b}-{\bf \eta}_{\omega}\right)^{\top}\end{bmatrix}^{\top}
+\end{align}
+
+\end_inset
+
+Each component is given by the following:
+\begin_inset Formula 
+\begin{equation}
+{\bf x}_{\text{uav}}=\left\langle \boldsymbol{p}_{b/I}^{I},\boldsymbol{v}_{b/I}^{b},\boldsymbol{q}_{I}^{b},\boldsymbol{\beta}_{a},\boldsymbol{\beta}_{\omega},b\right\rangle \in\mathbb{R}^{3}\times\mathbb{R}^{3}\times S^{3}\times\mathbb{R}^{3}\times\mathbb{R}^{3}\times\mathbb{R}^{1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+{\bf x}_{\text{vehicle}}=\left\langle \boldsymbol{p}_{g/I}^{I},\boldsymbol{v}_{g/I}^{g},\boldsymbol{q}_{I}^{g},{\bf \omega}_{g/I}^{g}\right\rangle \in\mathbb{R}^{3}\times S^{3}\times\mathbb{R}^{3}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Sensor Suite
+\end_layout
+
+\begin_layout Subsection
+UAV
+\end_layout
+
+\begin_layout Standard
+We will assume a minimum sensor suite onboard the UAV.
+ This
+\end_layout
+
+\begin_layout Itemize
+GPS
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Latitude Position
+\end_layout
+
+\begin_layout Itemize
+Logitude Position
+\end_layout
+
+\begin_layout Itemize
+Altitude?
+\end_layout
+
+\begin_layout Itemize
+North Velocity
+\end_layout
+
+\begin_layout Itemize
+East Velocity
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+IMU
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Body-fixed angular acceleration (omega)
+\end_layout
+
+\begin_layout Itemize
+Body-fixed linear acceleration
+\end_layout
+
+\begin_layout Itemize
+Estimated roll and pitch angles?
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Camera
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+ArUco detections (relative translation and rotation from camera to ArUco
+ frame)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Barometer
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Altitude relative to where we zero it
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Landing Vehicle
+\end_layout
+
+\begin_layout Itemize
+GPS
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Latitude Position
+\end_layout
+
+\begin_layout Itemize
+Longitude Position
+\end_layout
+
+\begin_layout Itemize
+Altitude?
+\end_layout
+
+\begin_layout Itemize
+North Velocity
+\end_layout
+
+\begin_layout Itemize
+East Velocity
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+IMU
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Body-fixed angular acceleration (omega)
+\end_layout
+
+\begin_layout Itemize
+Body-fixed linear acceleration
+\end_layout
+
+\begin_layout Itemize
+Estimated roll and pitch angles?
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Dealing with Delay
+\end_layout
+
+\begin_layout Standard
+With sensors on the landing vehicle, we must account for communication delay.
+ While the UAV is in the landing phase, close to the landing platform, we
+ assume that the vehicle can communicate its sensor readings to the UAV
+ intermitently.
+ This communication will result in significant delays and therefore the
+ estimator cannot simply update its estimate assuming that the measurement
+ accurately represents the current state.
+ To account for these delays, we first assume that we have a synchronized
+ clock between the UAV and the Landing Vehicle.
+ This is pretty easy to take care of since we have a GPS receiver on both
+ ends.
+ We can assume that all sensor readings are stamped with UTC time from GPS.
+\end_layout
+
+\begin_layout Standard
+Assuming that we know the accurate time stamps for when the measurements
+ were taken, we can properly account for these measurements with a buffer.
+ If we keep a buffer of the internals of the estimator, then upon receiving
+ a new measurement, we can use the estimator's state at the appropriate
+ time and repropagate it forward using the buffered sensor data.
+ Because this requires a lot of computation, we must make sure that our
+ buffer is only long enough to maintain real-time performance.
+ We cannot expect to rewind and repropagate the entire estimator large time
+ steps (i.e.
+ 10 seconds) every time we get a measurement.
+ If the measurements from the landing vehicle are only delayed about one
+ second then we can probably still operate at real time.
+\end_layout
+
+\begin_layout Subsection
+Implementation
+\end_layout
+
+\begin_layout Standard
+To implement the filter rewind/fast forward used to account for delayed
+ measurements, we can use a circular buffer.
+\end_layout
+
+\begin_layout Section
+Error State Dynamics
+\end_layout
+
+\begin_layout Standard
+Since the estimated state is not a vector, we must use an Error-State Kalman
+ Filter (ESKF).
+ We therefore need the error state dynamics of the state.
+ We define the error state to be
+\begin_inset Formula 
+\begin{equation}
+\tilde{{\bf x}}={\bf x}\boxminus\hat{{\bf x}}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula ${\bf x}$
+\end_inset
+
+ represents the true state, 
+\begin_inset Formula $\hat{{\bf x}}$
+\end_inset
+
+ represents the estimated state and 
+\begin_inset Formula $\tilde{{\bf x}}$
+\end_inset
+
+ represents the error state.
+ Since 
+\begin_inset Formula ${\bf x}$
+\end_inset
+
+ is not a vector quantity, we use the 
+\begin_inset Formula $\boxminus$
+\end_inset
+
+ operator to denote an appropriate subtraction operation for each quatnity
+ in the state tuple.
+ For vector quantities such as position, this is easily define as the regular
+ vector subtraction operation such that
+\begin_inset Formula 
+\begin{equation}
+\tilde{\boldsymbol{p}}_{b/I}^{I}=\boldsymbol{p}_{b/I}^{I}-\hat{\boldsymbol{p}}_{b/I}^{I}.
+\end{equation}
+
+\end_inset
+
+The only non vector quantities in our state tuple are the attitude representatio
+ns which are quaternions 
+\begin_inset Formula $\in S^{3}.$
+\end_inset
+
+ To help with these quantities, we first define the vector
+\begin_inset Formula 
+\begin{equation}
+{\bf r}_{I}^{b}\left(t\right)={\bf r}_{I}^{b}\left(t_{0}\right)+\int_{t_{0}}^{t}{\bf \omega}_{b/I}^{b}\left(\tau\right)d\tau,
+\end{equation}
+
+\end_inset
+
+such that 
+\begin_inset Formula ${\bf r}_{I}^{b}\left(t_{0}\right)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{{\bf r}}_{I}^{b}={\bf \omega}_{b/I}^{b}$
+\end_inset
+
+.
+ With this definition, we can express
+\begin_inset Formula 
+\begin{align}
+{\bf q}_{I}^{b} & ={\bf \hat{q}}_{I}^{b}\otimes\exp_{{\bf q}}\left(\tilde{{\bf r}}\right)\\
+\tilde{{\bf r}} & =\log_{{\bf q}}\left(\left({\bf \hat{q}}_{I}^{b}\right)^{-1}\otimes{\bf q}_{I}^{b}\right)
+\end{align}
+
+\end_inset
+
+or as in Hertzberg
+\begin_inset Formula 
+\begin{align}
+{\bf q}_{I}^{b} & ={\bf \hat{q}}_{I}^{b}\boxplus\tilde{{\bf r}}\\
+\tilde{{\bf r}} & ={\bf q}_{I}^{b}\boxminus{\bf \hat{q}}_{I}^{b}.
+\end{align}
+
+\end_inset
+
+Even though 
+\begin_inset Formula ${\bf r}_{I}^{b}$
+\end_inset
+
+ is a vector, we cannot simply compute the error-state as 
+\begin_inset Formula $\tilde{{\bf r}}_{I}^{b}={\bf r}_{I}^{b}-\hat{{\bf r}}_{I}^{b}$
+\end_inset
+
+ because 
+\begin_inset Formula ${\bf r}_{I}^{b}$
+\end_inset
+
+ is a minimal representation of 
+\begin_inset Formula ${\bf q}_{I}^{b}$
+\end_inset
+
+, which is a double cover of the Lie group 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+.
+ Vector subtraction of members in this group is not valid.
+ However, the derivative of 
+\begin_inset Formula ${\bf r}_{I}^{b}$
+\end_inset
+
+ exists in the tangent space of 
+\begin_inset Formula $SO\left(3\right)$
+\end_inset
+
+, so we can perform
+\begin_inset Formula 
+\begin{equation}
+\dot{\tilde{{\bf r}}}_{I}^{b}=\dot{{\bf r}}_{I}^{b}-R_{I}^{b}\left(\hat{R}_{I}^{b}\right)^{\top}\dot{\hat{{\bf r}}}_{I}^{b}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $R_{I}^{b}\left(\hat{R}_{I}^{b}\right)^{\top}$
+\end_inset
+
+ moves the estimated vector derivative 
+\begin_inset Formula $\dot{\hat{{\bf r}}}_{I}^{b}$
+\end_inset
+
+ from its own tangent space to the tangent space of 
+\begin_inset Formula $\dot{{\bf r}}_{I}^{b}$
+\end_inset
+
+.
+ With both vectors in the same tangent space, the vector subtraction is
+ valid.
+\end_layout
+
+\begin_layout Subsection
+Identities
+\end_layout
+
+\begin_layout Standard
+To help derive the error-state dynamics, we first need to establish a few
+ identities and approximations.
+ We often convert quaternions to rotation matrices for notational convenience.
+ This is done by
+\begin_inset Formula 
+\begin{equation}
+R\left({\bf q}\right)=\left(2q_{0}^{2}-1\right)I-2q_{0}
+\end{equation}
+
+\end_inset
+
+Since rotation matrices concatenate in an order opposite to quaternions,
+ we have
+\begin_inset Formula 
+\begin{equation}
+R_{I}^{b}=R\left(\exp_{{\bf q}}\left(\tilde{{\bf r}}\right)\right)\hat{R}_{I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+UAV Dynamics
+\end_layout
+
+\begin_layout Subsubsection
+True State Dynamics
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{p}}_{b/I}^{I}=\left(R_{I}^{b}\right)^{T}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{v}}_{b/I}^{b}=\boldsymbol{e}_{3}\boldsymbol{e}_{3}^{T}\boldsymbol{a}_{b/I}^{b}+R_{I}^{b}\boldsymbol{g}^{I}-b\begin{bmatrix}\boldsymbol{e}_{1} & \boldsymbol{e}_{2} & \boldsymbol{0}\end{bmatrix}\boldsymbol{v}_{b/I}^{b}-\left(\boldsymbol{\omega}_{b/I}^{b}\right)^{\mathcircumflex}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{q}}_{I}^{b}=\frac{1}{2}{\bf q}_{t}\otimes{\bf \omega}_{t}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{a}={\bf a}_{w}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{\omega}={\bf \omega}_{w}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{b}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+Here the true acceleration and angular rate are obtained from an IMU in
+ the form of noisy sensor readings 
+\begin_inset Formula ${\bf a}_{m}$
+\end_inset
+
+and 
+\begin_inset Formula ${\bf \omega}_{m}$
+\end_inset
+
+ in body frame, namely
+\begin_inset Formula 
+\begin{equation}
+{\bf a}_{m}={\bf a}_{t}+{\bf \beta}_{a}+{\bf a}_{noise}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+{\bf \omega}_{m}={\bf \omega}_{t}+{\bf \beta}_{\omega}+{\bf \omega}_{noise}
+\end{equation}
+
+\end_inset
+
+With this, the true values can be isolated such that
+\begin_inset Formula 
+\begin{equation}
+{\bf a}_{t}={\bf a}_{m}-{\bf \beta}_{a}-{\bf a}_{noise}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+{\bf \omega}_{t}={\bf \omega}_{m}-{\bf \beta}_{\omega}-{\bf \omega}_{noise}
+\end{equation}
+
+\end_inset
+
+Substituing these into the true kinematic equations we get
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{p}}_{b/I}^{I}=\left(R_{I}^{b}\right)^{T}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{v}}_{b/I}^{b}=\boldsymbol{e}_{3}\boldsymbol{e}_{3}^{T}\left({\bf a}_{m}-{\bf \beta}_{a}-{\bf a}_{noise}\right)+R_{I}^{b}\boldsymbol{g}^{I}-b\begin{bmatrix}\boldsymbol{e}_{1} & \boldsymbol{e}_{2} & \boldsymbol{0}\end{bmatrix}\boldsymbol{v}_{b/I}^{b}-\left({\bf \omega}_{m}-{\bf \beta}_{\omega}-{\bf \omega}_{noise}\right)^{\mathcircumflex}\boldsymbol{v}_{b/I}^{b}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\dot{q}}_{I}^{b}=\frac{1}{2}{\bf q}_{t}\otimes\left({\bf \omega}_{m}-{\bf \beta}_{\omega}-{\bf \omega}_{noise}\right)
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{a}={\bf a}_{w}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{\beta}_{\omega}={\bf \omega}_{w}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\dot{b}=\boldsymbol{0}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Vehicle Dynamics
+\end_layout
+
+\begin_layout Standard
+We will first assume a unicycle model for the landing vehicle.
+\end_layout
+
+\begin_layout Subsubsection
+True State Dynamics
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset Formula 
+\begin{align}
+\dot{\boldsymbol{p}}_{g/I}^{I} & =\left(R_{I}^{g}\right)^{\top}\boldsymbol{v}_{g/I}^{g}\\
+\boldsymbol{\dot{v}}_{g/I}^{g} & =\boldsymbol{0}+\boldsymbol{\eta}_{vg}\\
+\boldsymbol{\dot{q}}_{I}^{g} & =\frac{1}{2}{\bf q}_{I}^{g}\otimes{\bf \omega}_{g/I}^{g}\\
+{\bf \dot{\omega}}_{g/I}^{g} & =\boldsymbol{0}+\boldsymbol{\eta}_{\omega g}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Nominal State Dynamics
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset Formula 
+\begin{align}
+\dot{\boldsymbol{p}}_{g/I}^{I} & =\left(R_{I}^{g}\right)^{\top}\boldsymbol{v}_{g/I}^{g}\\
+\boldsymbol{\dot{v}}_{g/I}^{g} & =\boldsymbol{0}\\
+\boldsymbol{\dot{q}}_{I}^{g} & =\frac{1}{2}{\bf q}_{I}^{g}\otimes{\bf \omega}_{g/I}^{g}\\
+{\bf \dot{\omega}}_{g/I}^{g} & =\boldsymbol{0}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Error State Dynamics
+\end_layout
+
+\begin_layout Standard
+For many of the states, such as position, this is pretty straight forward.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\boldsymbol{p}_{g/I}^{I} & =\hat{\boldsymbol{p}}_{g/I}^{I}+\tilde{\boldsymbol{p}}_{g/I}^{I}\\
+\dot{\boldsymbol{p}}_{g/I}^{I} & =\dot{\hat{\boldsymbol{p}}}_{g/I}^{I}+\dot{\tilde{\boldsymbol{p}}}_{g/I}^{I}\\
+\dot{\tilde{\boldsymbol{p}}}_{g/I}^{I} & =\dot{\boldsymbol{p}}_{g/I}^{I}-\dot{\hat{\boldsymbol{p}}}_{g/I}^{I}
+\end{align}
+
+\end_inset
+
+We can then substitute in dynamics
+\begin_inset Formula 
+\begin{align}
+\dot{\tilde{\boldsymbol{p}}}_{g/I}^{I} & =\dot{\boldsymbol{p}}_{g/I}^{I}-\dot{\hat{\boldsymbol{p}}}_{g/I}^{I}\\
+ & =\left(R_{I}^{g}\right)^{\top}\boldsymbol{v}_{g/I}^{g}-\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\\
+ & =\left(R_{I}^{g}\left(I+\left[\delta{\bf \theta}\right]_{\times}\right)\right)^{\top}\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\\
+ & =\left(\left(I+\left[\delta{\bf \theta}\right]_{\times}\right)\right)^{\top}\left(\hat{R}_{I}^{g}\right)^{\top}\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\\
+ & =\left(I-\left[\delta{\bf \theta}\right]_{\times}\right)\left(\hat{R}_{I}^{g}\right)^{\top}\left(\hat{\boldsymbol{v}}_{g/I}^{g}+\tilde{\boldsymbol{v}}_{g/I}^{g}\right)-\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\\
+ & =\left(\hat{R}_{I}^{g}\right)^{\top}\tilde{\boldsymbol{v}}_{g/I}^{g}-\left[\delta{\bf \theta}\right]_{\times}\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\\
+ & =\left(\hat{R}_{I}^{g}\right)^{\top}\tilde{\boldsymbol{v}}_{g/I}^{g}+\left[\left(\hat{R}_{I}^{g}\right)^{\top}\hat{\boldsymbol{v}}_{g/I}^{g}\right]_{\times}\delta{\bf \theta}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\dot{\tilde{\boldsymbol{v}}}_{g/I}^{g} & =\dot{\boldsymbol{v}}_{g/I}^{g}-\dot{\hat{\boldsymbol{v}}}_{g/I}^{g}\\
+ & =\left(\boldsymbol{0}+\boldsymbol{\eta}_{vg}\right)-\boldsymbol{0}\\
+ & =\boldsymbol{\eta}_{vg}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\dot{\tilde{\boldsymbol{q}}}_{I}^{g} & =\dot{\boldsymbol{q}}_{I}^{g}\boxminus\dot{\hat{\boldsymbol{q}}}_{I}^{g}\\
+ & TODO
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\dot{\tilde{\boldsymbol{\omega}}}_{g/I}^{g} & =\dot{\boldsymbol{\omega}}_{g/I}^{g}-\dot{\hat{\boldsymbol{\omega}}}_{g/I}^{g}\\
+ & =\left(\boldsymbol{0}+\boldsymbol{\eta}_{\omega g}\right)-\boldsymbol{0}\\
+ & =\boldsymbol{\eta}_{\omega g}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Control
+\end_layout
+
+\begin_layout Standard
+For the purpose of this project, we will focus on control during the landing
+ phase of the problem (i.e.
+ after we have seen the landing marker and initialized our relative estimator).
+ With this in mind, we will choose to control the multirotor with desired
+ angular rates, 
+\begin_inset Formula ${\bf \omega}$
+\end_inset
+
+ and throttle, 
+\begin_inset Formula $F$
+\end_inset
+
+, such that our control signal is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+{\bf u}=\begin{bmatrix}F & {\bf \omega}_{b/I}^{b}\end{bmatrix}\in\mathbb{R}^{4\times1}.
+\end{equation}
+
+\end_inset
+
+ The state that we wish to control is given by
+\begin_inset Formula 
+\begin{equation}
+{\bf x}=\begin{bmatrix}{\bf p}_{c/g}^{c} & {\bf v}_{/I}^{b} & {\bf q}_{I}^{c}\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+In addition to the state, we would also need to know the value of 
+\begin_inset Formula ${\bf v}_{g/I}^{I}=\left(R_{I}^{g}\right)^{\top}$
+\end_inset
+
+ which we assume to be instantaneously constant.
+ The dynamics of our state are given by
+\begin_inset Formula 
+\begin{align}
+{\bf \dot{p}}_{b/g}^{b} & ={\bf v}_{b/g}^{b}\\
+ & ={\bf v}_{b/I}^{b}-{\bf v}_{g/I}^{b}\\
+ & ={\bf v}_{b/I}^{b}-R_{I}^{b}\left(R_{I}^{g}\right)^{\top}{\bf v}_{g/I}^{g}\\
+\dot{{\bf v}}_{b/I}^{b} & =gR_{i}^{b}{\bf e}_{3}-F\frac{g}{F_{\text{hover}}}{\bf e}_{3}-M{\bf v}_{b/i}^{b}-{\bf \omega}_{b/i}^{b}\times{\bf v}_{b/i}^{b}\\
+\dot{{\bf q}}_{I}^{b} & ={\bf \omega}_{b/I}^{b}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+MPC Control
+\end_layout
+
+\begin_layout Standard
+What if we computed the control in the camera frame? So that our control
+ is given by
+\begin_inset Formula 
+\begin{equation}
+{\bf u}=\begin{bmatrix}F & {\bf \omega}_{b/I}^{b}\end{bmatrix}\in\mathbb{R}^{4\times1}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Dynamics
+\end_layout
+
+\begin_layout Standard
+Let's formulate our state in the camera frame then as well so that
+\begin_inset Formula 
+\begin{equation}
+{\bf x}=\begin{bmatrix}{\bf p}_{c/g}^{c} & {\bf v}_{c/I}^{c} & {\bf q}_{I}^{c} & {\bf v}_{g/I}^{g} & {\bf q}_{I}^{g} & {\bf q}\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+The nonlinear dynamics are then given by
+\begin_inset Formula 
+\begin{align}
+{\bf \dot{p}}_{c/g}^{c} & ={\bf v}_{c/g}^{c}\\
+ & ={\bf v}_{c/I}^{c}-{\bf v}_{g/I}^{c}\\
+ & ={\bf v}_{c/I}^{c}-R_{b}^{c}R_{I}^{b}\left(R_{I}^{g}\right)^{\top}{\bf v}_{g/I}^{g}\\
+\dot{{\bf v}}_{b/I}^{b} & =gR_{i}^{b}{\bf e}_{3}-F\frac{g}{F_{\text{hover}}}{\bf e}_{3}-M{\bf v}_{b/i}^{b}-{\bf \omega}_{b/i}^{b}\times{\bf v}_{b/i}^{b}\\
+\dot{{\bf q}}_{I}^{b} & ={\bf \omega}_{b/I}^{b}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Constraints
+\end_layout
+
+\begin_layout Standard
+The reason for doing MPC control is to have contraints to keep the landing
+ marker in the camera FOV at all times.
+ This requires that we keep the corners of the ArUco marker in the image
+ plane at all times (and additionally make sure it is big enough).
+ If we assume that the landing target is 1m x 1m, we know that the corners
+ of the ArUco marker are given by 
+\begin_inset Formula 
+\begin{equation}
+{\bf p}_{g/\text{corners}}^{g}=\begin{bmatrix}0.5\\
+0.5\\
+0
+\end{bmatrix},\begin{bmatrix}0.5\\
+-0.5\\
+0
+\end{bmatrix},\begin{bmatrix}-0.5\\
+0.5\\
+0
+\end{bmatrix},\begin{bmatrix}-0.5\\
+-0.5\\
+0
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+To project these into the camera image we know that if
+\begin_inset Formula 
+\begin{equation}
+{\bf p}_{c/\text{object}}^{c}=\begin{bmatrix}X\\
+Y\\
+Z
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+then the pixels in the image plane are given by
+\series bold
+
+\begin_inset Formula 
+\begin{equation}
+\begin{bmatrix}p_{x}\\
+p_{y}
+\end{bmatrix}=\frac{f}{Z}\begin{bmatrix}X\\
+Y
+\end{bmatrix}+\begin{bmatrix}c_{x}\\
+c_{y}
+\end{bmatrix}.
+\end{equation}
+
+\end_inset
+
+
+\series default
+This means that we just need to know 
+\begin_inset Formula ${\bf p}_{c/\text{\text{corners}}}^{c}$
+\end_inset
+
+ which is given by
+\begin_inset Formula 
+\begin{align}
+{\bf p}_{c/\text{\text{corners}}}^{c} & ={\bf p}_{c/\text{g}}^{c}-{\bf p}_{g/\text{\text{corners}}}^{c}\\
+ & ={\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}.
+\end{align}
+
+\end_inset
+
+Which means that
+\begin_inset Formula 
+\begin{align}
+\begin{bmatrix}p_{x}\\
+p_{y}
+\end{bmatrix} & =\frac{f}{{\bf p}_{c/\text{\text{corners}}}^{c}{\bf e}_{3}}\begin{bmatrix}{\bf p}_{c/\text{\text{corners}}}^{c}{\bf e}_{1}\\
+{\bf p}_{c/\text{\text{corners}}}^{c}{\bf e}_{2}
+\end{bmatrix}+\begin{bmatrix}c_{x}\\
+c_{y}
+\end{bmatrix}\\
+\begin{bmatrix}p_{x}\\
+p_{y}
+\end{bmatrix} & =\frac{f}{\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{3}}\begin{bmatrix}\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{1}\\
+\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{2}
+\end{bmatrix}+\begin{bmatrix}c_{x}\\
+c_{y}
+\end{bmatrix}.
+\end{align}
+
+\end_inset
+
+And we want to ensure that
+\begin_inset Formula 
+\begin{align}
+p_{x\min} & <p_{x}<p_{x\max}\\
+p_{y\min} & <p_{y}<p_{y\max}.
+\end{align}
+
+\end_inset
+
+ For our situation this means that
+\begin_inset Formula 
+\begin{align}
+p_{x\min} & <\frac{f}{\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{3}}\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{1}<p_{x\max}\\
+\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{3}p_{x\min} & <f\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{1}<\left({\bf p}_{c/\text{g}}^{c}-R_{b}^{c}R_{I}^{b}R_{g}^{I}{\bf p}_{g/\text{\text{corners}}}^{g}\right){\bf e}_{3}p_{x\max}\\
+{\bf p}_{c/\text{g}}^{c} & =state\\
+R_{b}^{c}R_{I}^{b} & =state\\
+R_{g}^{I} & =constant?orState?\\
+{\bf p}_{g/\text{\text{corners}}}^{g} & =constant\\
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Trajectory Generation
+\end_layout
+
+\begin_layout Standard
+We need to generate a smooth trajectory that takes the drone from its current
+ position with respect to the goal, 
+\begin_inset Formula ${\bf p}_{b/g}^{b}$
+\end_inset
+
+ to the landing point where 
+\begin_inset Formula ${\bf p}_{b/g}^{b}={\bf 0}$
 \end_inset
 
 
